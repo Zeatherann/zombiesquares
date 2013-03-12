@@ -2,7 +2,7 @@
 #define ENEMY_HPP
 class Enemy:public Entity{
 public:
-    static vector<Enemy> Enemies;
+    static vector<Enemy*> Enemies;
     // Variables
     short Power;
     char Tick;

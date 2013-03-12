@@ -14,10 +14,10 @@ void Lazer::Update(){
     unsigned char& A=Color.a;
     if(A>0u){
         A-=5u;
-        for(Enemy& E:Enemy::Enemies){
-            if(E.X==X&&E.Y==Y&&Hit.count(&E)==0){
-                E.Life-=Power;
-                Hit.insert(&E);
+        for(Enemy* E:Enemy::Enemies){
+            if(E->X==X&&E->Y==Y&&Hit.count(E)==0){
+                E->Life-=Power;
+                Hit.insert(E);
             }
         }
     }

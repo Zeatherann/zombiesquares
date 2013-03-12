@@ -114,27 +114,28 @@ int main(){
         }
         Remove.clear();
         // Update Enemies
-        for(Enemy& E:Enemy::Enemies){
-            char C=GetTile(Maze,E.X,E.Y);
+        for(Enemy* E:Enemy::Enemies){
+            char C=GetTile(Maze,E->X,E->Y);
             bool Keep=true;
             if(C==1)Keep=false;
-            if(E.Life<=0){
+            if(E->Life<=0){
                 Keep=false;
                 Character.Point(1);
             }
-            if(E.X==Character.X&&E.Y==Character.Y){
+            if(E->X==Character.X&&E->Y==Character.Y){
                 Keep=false;
-                Character.Point(-E.Power);
+                Character.Point(-E->Power);
             }
-            if(Keep)E.Update();
-            else Remove.insert(&E);
+            if(Keep)E->Update();
+            else Remove.insert(E);
         }
         // Remove Enemies in invalid locations
         if(Remove.size()){
             for(const Entity* E:Remove){
                 for(unsigned int i=0u;i<Enemy::Enemies.size();i++){
-                    if(&Enemy::Enemies[i]==E){
+                    if(Enemy::Enemies[i]==E){
                         Enemy::Enemies.erase(Enemy::Enemies.begin()+i);
+                        delete E;
                         break;
                     }
                 }
@@ -143,9 +144,9 @@ int main(){
         // Update Player
         Character.Update();
         // Draw Enemies
-        for(Enemy& E:Enemy::Enemies){
-            pairi L(E.X,E.Y);
-            if(Draw||Character.InSight(L))E.Draw(App);
+        for(Enemy* E:Enemy::Enemies){
+            pairi L(E->X,E->Y);
+            if(Draw||Character.InSight(L))E->Draw(App);
         }
         // Draw Lazers
         for(Lazer* E:Lazer::Lazers){

@@ -36,8 +36,8 @@ void Save(string FileName,const Player& Character){
     }
     Block=Data::In(Enemy::Enemies.size());
     File.write(Block.first,4u);
-    for(const Enemy& E:Enemy::Enemies){
-        E.Save(File);
+    for(const Enemy* E:Enemy::Enemies){
+        E->Save(File);
     }
 }
 
@@ -62,8 +62,9 @@ void Load(string FileName,Player& Character){
     }
     File.read((char*)&Size,4u);
     for(unsigned int i=0u;i<Size;i++){
-        Enemy& E=*Enemy::Enemies.insert(Enemy::Enemies.end(),Enemy());
-        E.Load(File);
+        Enemy* E = new Enemy();
+        Enemy::Enemies.push_back(E);
+        E->Load(File);
     }
 }
 

@@ -1,9 +1,9 @@
 #include "main.hpp"
 
-vector<Enemy> Enemy::Enemies;
+vector<Enemy*> Enemy::Enemies;
 
 void Enemy::New(int x,int y,short p){
-    Enemies.push_back(Enemy(x,y,p));
+    Enemies.push_back(new Enemy(x,y,p));
 }
 
 Enemy::Enemy(int x,int y,short p):Entity(x,y,sf::Color::Red,5),Power(p),Tick(20){}
