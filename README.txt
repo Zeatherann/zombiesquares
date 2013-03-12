@@ -1,4 +1,4 @@
-This is a simple game i made to test pathfinding and maze generation, enjoy!
+This is a simple game I made to test pathfinding and maze generation, enjoy!
 
 CONTROLS:
 
