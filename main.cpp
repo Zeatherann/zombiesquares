@@ -23,7 +23,6 @@ int main(){
     bool Draw=false;
     map<sf::Key::Code,pairi> MoveKeys={{sf::Key::W,pairi(0,-1)},{sf::Key::S,pairi(0,1)},{sf::Key::A,pairi(-1,0)},{sf::Key::D,pairi(1,0)}};
     map<sf::Key::Code,pairi> ShootKeys={{sf::Key::Up,pairi(0,-1)},{sf::Key::Down,pairi(0,1)},{sf::Key::Left,pairi(-1,0)},{sf::Key::Right,pairi(1,0)}};
-    pairi MouseTile;
     // Setup
     sf::IntRect StartArea(-3,-3,3,3);
     for(int a=StartArea.Left;a<=StartArea.Right;a++){ // Create Starting Area
@@ -53,11 +52,6 @@ int main(){
             switch(Events.Type){
                 case sf::Event::Closed:{
                     App.Close();
-                    break;
-                }case sf::Event::MouseMoved:{
-                    sf::Vector2f Coords=App.ConvertCoords(Events.MouseMove.X,Events.MouseMove.Y);
-                    MouseTile.first=int(Coords.x/TileSize)+X;
-                    MouseTile.second=int(Coords.y/TileSize)+Y;
                     break;
                 }case sf::Event::KeyPressed:{
                     sf::Key::Code Key=Events.Key.Code;
@@ -155,12 +149,9 @@ int main(){
         }
         // Draw Player
         Character.Draw(App);
-        // Draw Mouse Location
-        float W=ScoreTxt.GetRect().GetWidth();
-        Squares[3].SetPosition(MouseTile.first*TileSize,MouseTile.second*TileSize);
-        App.Draw(Squares[3]);
         // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,SWidth,SHeight));
+        float W=ScoreTxt.GetRect().GetWidth();
         // Draw HighScore
         HighScore.SetPosition(W+Bullets.GetRect().GetWidth(),0);
         App.Draw(HighScore);
