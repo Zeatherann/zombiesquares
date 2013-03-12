@@ -15,5 +15,7 @@ public:
     // Functions
     void Draw(sf::RenderWindow& Window);
     virtual void Update()=0;
+    virtual void Save(ofstream& File)const;
+    virtual void Load(ifstream& File);
 };
 #endif // ENTITY_HPP

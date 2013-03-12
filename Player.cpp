@@ -83,3 +83,23 @@ bool Player::InSight(pairi Loc){
     }
     return false;
 }
+
+void Player::Save(ofstream& File)const{
+    Entity::Save(File);
+    File.write((char*)&Score,4u);
+    File.write((char*)&HScore,4u);
+    File.write((char*)&Timer,4u);
+    File.write((char*)&Shots,4u);
+}
+
+void Player::Load(ifstream& File){
+    Entity::Load(File);
+    File.read((char*)&Score,4u);
+    File.read((char*)&HScore,4u);
+    File.read((char*)&Timer,4u);
+    File.read((char*)&Shots,4u);
+    EvalMaze(Pathing,pairi(X,Y),25,{1,4});
+    EvalMaze(Sight,pairi(X,Y),6,{1});
+    Bullets.SetText(" Bullets: "+ToString(Shots));
+    High.SetText("  High Score: "+ToString(HScore));
+}

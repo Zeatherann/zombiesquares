@@ -13,5 +13,7 @@ public:
     ~Enemy();
     // Functions
     void Update();
+    void Save(ofstream& File)const;
+    void Load(ifstream& File);
 };
 #endif // ENEMY_HPP

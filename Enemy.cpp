@@ -29,3 +29,15 @@ void Enemy::Update(){
         }
     }
 }
+
+void Enemy::Save(ofstream& File)const{
+    Entity::Save(File);
+    File.write((char*)&Power,2u);
+    File.write((char*)&Tick,1u);
+}
+
+void Enemy::Load(ifstream& File){
+    Entity::Load(File);
+    File.read((char*)&Power,2u);
+    File.read((char*)&Tick,1u);
+}

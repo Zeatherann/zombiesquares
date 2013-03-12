@@ -18,3 +18,23 @@ void Entity::Draw(sf::RenderWindow& Window){
     Tile.SetPointColor(3,Color);
     Window.Draw(Tile);
 }
+
+void Entity::Save(ofstream& File)const{
+    File.write((char*)&X,4u);
+    File.write((char*)&Y,4u);
+    File.write((char*)&Color.r,1u);
+    File.write((char*)&Color.g,1u);
+    File.write((char*)&Color.b,1u);
+    File.write((char*)&Color.a,1u);
+    File.write((char*)&Life,2u);
+}
+
+void Entity::Load(ifstream& File){
+    File.read((char*)&X,4u);
+    File.read((char*)&Y,4u);
+    File.read((char*)&Color.r,1u);
+    File.read((char*)&Color.g,1u);
+    File.read((char*)&Color.b,1u);
+    File.read((char*)&Color.a,1u);
+    File.read((char*)&Life,2u);
+}

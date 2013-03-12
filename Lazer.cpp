@@ -22,3 +22,13 @@ void Lazer::Update(){
         }
     }
 }
+
+void Lazer::Save(ofstream& File)const{
+    Entity::Save(File);
+    File.write((char*)&Power,2u);
+}
+
+void Lazer::Load(ifstream& File){
+    Entity::Load(File);
+    File.read((char*)&Power,2u);
+}

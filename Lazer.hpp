@@ -13,5 +13,7 @@ public:
     ~Lazer();
     // Functions
     void Update();
+    void Save(ofstream& File)const;
+    void Load(ifstream& File);
 };
 #endif // LAZER_HPP
