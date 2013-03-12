@@ -2,7 +2,7 @@
 #define LAZER_HPP
 class Lazer:public Entity{
 public:
-    static vector<Lazer> Lazers;
+    static vector<Lazer*> Lazers;
     // Variables
     set<Enemy*> Hit;
     short Power;

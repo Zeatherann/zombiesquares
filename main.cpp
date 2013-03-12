@@ -99,14 +99,15 @@ int main(){
         }
         set<Entity*> Remove;
         // Update Lazers
-        for(Lazer& L:Lazer::Lazers){
-            if(L.Color.a==0)Remove.insert(&L);
-            else L.Update();
+        for(Lazer* L:Lazer::Lazers){
+            if(L->Color.a==0)Remove.insert(L);
+            else L->Update();
         }
         for(const Entity* E:Remove){
             for(unsigned int i=0u;i<Lazer::Lazers.size();i++){
-                if(&Lazer::Lazers[i]==E){
+                if(Lazer::Lazers[i]==E){
                     Lazer::Lazers.erase(Lazer::Lazers.begin()+i);
+                    delete E;
                     break;
                 }
             }
@@ -147,9 +148,9 @@ int main(){
             if(Draw||Character.InSight(L))E.Draw(App);
         }
         // Draw Lazers
-        for(Lazer& E:Lazer::Lazers){
-            pairi L(E.X,E.Y);
-            if(Draw||Character.InSight(L))E.Draw(App);
+        for(Lazer* E:Lazer::Lazers){
+            pairi L(E->X,E->Y);
+            if(Draw||Character.InSight(L))E->Draw(App);
         }
         // Draw Player
         Character.Draw(App);
@@ -263,8 +264,8 @@ void Save(string FileName,const Player& Character){
     Character.Save(File);
     Block=Data::In(Lazer::Lazers.size());
     File.write(Block.first,4u);
-    for(const Lazer& L:Lazer::Lazers){
-        L.Save(File);
+    for(const Lazer* L:Lazer::Lazers){
+        L->Save(File);
     }
     Block=Data::In(Enemy::Enemies.size());
     File.write(Block.first,4u);
@@ -288,8 +289,9 @@ void Load(string FileName,Player& Character){
     Character.Load(File);
     File.read((char*)&Size,4u);
     for(unsigned int i=0u;i<Size;i++){
-        Lazer& L=*Lazer::Lazers.insert(Lazer::Lazers.end(),Lazer());
-        L.Load(File);
+        Lazer* L = new Lazer();
+        Lazer::Lazers.push_back(L);
+        L->Load(File);
     }
     File.read((char*)&Size,4u);
     for(unsigned int i=0u;i<Size;i++){
