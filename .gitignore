@@ -1,0 +1,5 @@
+*.depend
+*.layout
+Debug/*
+Release/*
+*.exe
