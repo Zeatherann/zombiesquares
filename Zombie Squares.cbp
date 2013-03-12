@@ -51,6 +51,8 @@
 		<Unit filename="Maze1.txt" />
 		<Unit filename="Player.cpp" />
 		<Unit filename="Player.hpp" />
+		<Unit filename="Saving.cpp" />
+		<Unit filename="Saving.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.hpp" />
 		<Extensions>
