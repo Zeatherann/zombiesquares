@@ -6,7 +6,7 @@ void Enemy::New(int x,int y,short p){
     Enemies.push_back(Enemy(x,y,p));
 }
 
-Enemy::Enemy(int x,int y,short p):Entity(x,y,sf::Color::Red,5),Power(p),Tick(20){}
+Enemy::Enemy(int x,int y,short p):Entity(x,y,sf::Color::Red,4),Power(p),Tick(20){}
 
 Enemy::~Enemy(){}
 
