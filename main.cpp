@@ -32,7 +32,7 @@ int main(){
     }
     App.SetView(Cam);
     App.SetFramerateLimit(30);
-    for(unsigned int i=0u;i<TileNum;i++)Squares[i]=sf::Shape::Rectangle({0,0},{TileSize,TileSize},Tiles[i],1.f,Tiles[i]+HighLight);
+    for(unsigned int i=0u;i<TileNum;i++)Squares[i]=sf::Shape::Rectangle({1,1},{TileSize-2,TileSize-2},Tiles[i],1.f,Tiles[i]+HighLight);
     if(!Font.LoadFromFile("Font.ttf",(unsigned int)TileSize)){
         cout<<"Unable to load font \'Font.ttf\'!"<<endl;
         exit(11);
