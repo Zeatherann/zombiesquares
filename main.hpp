@@ -59,10 +59,6 @@ char MakeTile(maze& Tiles,int x,int y);
 inline char GetTile(maze& Tiles,int x,int y){
     return Tiles.count(pairi(x,y))?Tiles[pairi(x,y)]:MakeTile(Tiles,x,y);
 }
-maze LoadMaze(string FileName);
-void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers);
-void Save(string FileName,const Player& Character);
-void Load(string FileName,Player& Character);
 // Templates
 template<typename Type>inline set<Type>& operator+=(set<Type>& L,const set<Type>& R){
     L.insert(R.begin(),R.end());
@@ -81,4 +77,5 @@ template<typename Type1,typename Type2>inline ostream& operator<<(ostream& L,con
 #include "Lazer.hpp"
 #include "Player.hpp"
 #include "Enemy.hpp"
+#include "Saving.hpp"
 #endif // MazePathing
