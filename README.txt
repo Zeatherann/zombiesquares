@@ -20,3 +20,4 @@ Enemies will chase you, if they move onto your square, you lose one point.
 Killing an enemy yields one point.
 Lazers can hurt multiple enemies at once.
 There is no way to lose (negative scores are allowed) and no way to win (the maze is infinite).
+When you close the game, your progress will be saved, and loaded when you restart. To start a new game, delete the file "SaveGame.zs" in the directory of the game.
