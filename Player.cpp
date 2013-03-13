@@ -44,7 +44,7 @@ bool Player::MoveTo(pairi Loc){
 }
 
 void Player::Shoot(pairi Direction){
-    if(!Shots)return;
+    if(!Shots||Direction==pairi(0,0))return;
     Shots--;
     Bullets.SetText(" Bullets: "+ToString(Shots));
     pairi C(X,Y);
