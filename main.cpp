@@ -19,6 +19,7 @@ int main(){
     sf::String ScoreTxt("Score: 0",Font,TileSize);
     sf::String Bullets(" Bullets: 3",Font,TileSize);
     sf::String HighScore(" HighScore: 0",Font,TileSize);
+    sf::PostFX MenuGray;
     new Player(ScoreTxt,Bullets,HighScore);
     bool Draw=false;
     map<sf::Key::Code,pairi> MoveKeys={{sf::Key::W,pairi(0,-1)},{sf::Key::S,pairi(0,1)},{sf::Key::A,pairi(-1,0)},{sf::Key::D,pairi(1,0)}};
@@ -38,6 +39,11 @@ int main(){
         exit(11);
     }
     ((sf::Image&)Font.GetImage()).SetSmooth(false);
+    if(!MenuGray.LoadFromFile("MenuEffect.sfx")){
+        cout<<"Unable to load file \'MenuEffect.sfx\'!"<<endl;
+        exit(10);
+    }
+    MenuGray.SetTexture("framebuffer", NULL);
     // Game Loop
     if(FileExists("SaveGame.zs"))Load("SaveGame.zs");
     while(App.IsOpened()){
@@ -99,6 +105,7 @@ int main(){
         }
         // Update and Draw Entities
         Entity::Tick(App);
+        App.Draw(MenuGray);
         // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,SWidth,SHeight));
         float W=ScoreTxt.GetRect().GetWidth();
