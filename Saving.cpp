@@ -21,6 +21,7 @@ maze LoadMaze(string FileName){
 
 void Save(string FileName){
     ofstream File(FileName.c_str(),ios::out|ios::binary);
+    File.write((char*)&GameTime,4u);
     Data::Chunk Block=Data::In(Maze.size());
     File.write(Block.first,4u);
     for(const pair<const pairi,char>& Iter:Maze){
@@ -39,6 +40,7 @@ void Save(string FileName){
 void Load(string FileName){
     Maze.clear();
     ifstream File(FileName.c_str(),ios::in|ios::binary);
+    File.read((char*)&GameTime,4u);
     unsigned int Size=0u;
     File.read((char*)&Size,4u);
     for(unsigned int i=0u;i<Size;i++){
