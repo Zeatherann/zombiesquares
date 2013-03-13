@@ -3,7 +3,7 @@
 
 maze LoadMaze(string FileName);
 void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers);
-void Save(string FileName,const Player& Character);
-void Load(string FileName,Player& Character);
+void Save(string FileName);
+void Load(string FileName);
 
 #endif // SAVING_HPP_INCLUDED

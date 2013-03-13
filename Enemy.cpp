@@ -1,12 +1,6 @@
 #include "main.hpp"
 
-vector<Enemy*> Enemy::Enemies;
-
-void Enemy::New(int x,int y,short p){
-    Enemies.push_back(new Enemy(x,y,p));
-}
-
-Enemy::Enemy(int x,int y,short p):Entity(x,y,sf::Color::Red,5),Power(p),Tick(20){}
+Enemy::Enemy(int x,int y,short p):Entity('E',x,y,sf::Color::Red,5),Power(p),Tick(20){}
 
 Enemy::~Enemy(){}
 
@@ -40,4 +34,19 @@ void Enemy::Load(ifstream& File){
     Entity::Load(File);
     File.read((char*)&Power,2u);
     File.read((char*)&Tick,1u);
+}
+
+bool Enemy::Remove()const{
+    Player* Char=Player::Character;
+    char C=GetTile(Maze,X,Y);
+    if(C==1)return true;
+    if(Life<=0){
+        if(Char)Char->Point(1);
+        return true;
+    }
+    if(Char&&X==Char->X&&Y==Char->Y){
+        Char->Point(-Power);
+        return true;
+    }
+    return false;
 }

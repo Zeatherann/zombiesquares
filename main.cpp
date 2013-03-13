@@ -19,7 +19,7 @@ int main(){
     sf::String ScoreTxt("Score: 0",Font,TileSize);
     sf::String Bullets(" Bullets: 3",Font,TileSize);
     sf::String HighScore(" HighScore: 0",Font,TileSize);
-    Player Character(ScoreTxt,Bullets,HighScore);
+    new Player(ScoreTxt,Bullets,HighScore);
     bool Draw=false;
     map<sf::Key::Code,pairi> MoveKeys={{sf::Key::W,pairi(0,-1)},{sf::Key::S,pairi(0,1)},{sf::Key::A,pairi(-1,0)},{sf::Key::D,pairi(1,0)}};
     map<sf::Key::Code,pairi> ShootKeys={{sf::Key::Up,pairi(0,-1)},{sf::Key::Down,pairi(0,1)},{sf::Key::Left,pairi(-1,0)},{sf::Key::Right,pairi(1,0)}};
@@ -39,7 +39,7 @@ int main(){
     }
     ((sf::Image&)Font.GetImage()).SetSmooth(false);
     // Game Loop
-    if(FileExists("SaveGame.zs"))Load("SaveGame.zs",Character);
+    if(FileExists("SaveGame.zs"))Load("SaveGame.zs");
     while(App.IsOpened()){
         // Update Time
         Tick--;
@@ -57,9 +57,9 @@ int main(){
                 }case sf::Event::KeyPressed:{
                     sf::Key::Code Key=Events.Key.Code;
                     if(MoveKeys.count(Key)){
-                        Character.Move(MoveKeys[Key]);
+                        Player::Character->Move(MoveKeys[Key]);
                     }else if(ShootKeys.count(Key)){
-                        Character.Shoot(ShootKeys[Key]);
+                        Player::Character->Shoot(ShootKeys[Key]);
                     }else{
                         switch(Key){
                             case sf::Key::Escape:{
@@ -74,12 +74,12 @@ int main(){
         }// END EVENTS
         // Check Window
         if(!App.IsOpened()){
-            Save("SaveGame.zs",Character);
+            Save("SaveGame.zs");
             break;
         }
         // Update View
-        X=Character.X-CWidth;
-        Y=Character.Y-CHeight;
+        X=Player::Character->X-CWidth;
+        Y=Player::Character->Y-CHeight;
         Cam.SetFromRect(sf::FloatRect(X*TileSize,Y*TileSize,X*TileSize+SWidth,Y*TileSize+SHeight));
         // Draw Terrain
         sf::IntRect Screen(X-1,Y-1,X+Width+1,Y+Height+1);
@@ -88,7 +88,7 @@ int main(){
                 pairi C(x,y);
                 bool D=Draw;
                 if(!Draw){
-                    D=Character.InSight(C);
+                    D=Player::Character->InSight(C);
                 }
                 unsigned int Index=GetTile(Maze,x,y);
                 if(D){
@@ -97,64 +97,8 @@ int main(){
                 }
             }
         }
-        set<Entity*> Remove;
-        // Update Lazers
-        for(Lazer* L:Lazer::Lazers){
-            if(L->Color.a==0)Remove.insert(L);
-            else L->Update();
-        }
-        for(const Entity* E:Remove){
-            for(unsigned int i=0u;i<Lazer::Lazers.size();i++){
-                if(Lazer::Lazers[i]==E){
-                    Lazer::Lazers.erase(Lazer::Lazers.begin()+i);
-                    delete E;
-                    break;
-                }
-            }
-        }
-        Remove.clear();
-        // Update Enemies
-        for(Enemy* E:Enemy::Enemies){
-            char C=GetTile(Maze,E->X,E->Y);
-            bool Keep=true;
-            if(C==1)Keep=false;
-            if(E->Life<=0){
-                Keep=false;
-                Character.Point(1);
-            }
-            if(E->X==Character.X&&E->Y==Character.Y){
-                Keep=false;
-                Character.Point(-E->Power);
-            }
-            if(Keep)E->Update();
-            else Remove.insert(E);
-        }
-        // Remove Enemies in invalid locations
-        if(Remove.size()){
-            for(const Entity* E:Remove){
-                for(unsigned int i=0u;i<Enemy::Enemies.size();i++){
-                    if(Enemy::Enemies[i]==E){
-                        Enemy::Enemies.erase(Enemy::Enemies.begin()+i);
-                        delete E;
-                        break;
-                    }
-                }
-            }
-        }
-        // Update Player
-        Character.Update();
-        // Draw Enemies
-        for(Enemy* E:Enemy::Enemies){
-            pairi L(E->X,E->Y);
-            if(Draw||Character.InSight(L))E->Draw(App);
-        }
-        // Draw Lazers
-        for(Lazer* E:Lazer::Lazers){
-            pairi L(E->X,E->Y);
-            if(Draw||Character.InSight(L))E->Draw(App);
-        }
-        // Draw Player
-        Character.Draw(App);
+        // Update and Draw Entities
+        Entity::Tick(App);
         // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,SWidth,SHeight));
         float W=ScoreTxt.GetRect().GetWidth();
@@ -229,7 +173,7 @@ char MakeTile(maze& Tiles,int x,int y){
     }
     if(Ret==99){
         Ret=0;
-        Enemy::New(x,y,1+GameTime/50);
+        new Enemy(x,y,1+GameTime/50);
     }
     return Ret;
 }

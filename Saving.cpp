@@ -19,7 +19,7 @@ maze LoadMaze(string FileName){
     return Ret;
 }
 
-void Save(string FileName,const Player& Character){
+void Save(string FileName){
     ofstream File(FileName.c_str(),ios::out|ios::binary);
     Data::Chunk Block=Data::In(Maze.size());
     File.write(Block.first,4u);
@@ -28,20 +28,15 @@ void Save(string FileName,const Player& Character){
         Block=Data::In(Iter.first.second);File.write(Block.first,4u);
         File.write(&Iter.second,1u);
     }
-    Character.Save(File);
-    Block=Data::In(Lazer::Lazers.size());
+    // Save Entities
+    Block=Data::In(Entity::Entities.size());
     File.write(Block.first,4u);
-    for(const Lazer* L:Lazer::Lazers){
-        L->Save(File);
-    }
-    Block=Data::In(Enemy::Enemies.size());
-    File.write(Block.first,4u);
-    for(const Enemy* E:Enemy::Enemies){
-        E->Save(File);
+    for(const Entity* Iter:Entity::Entities){
+        Iter->Save(File);
     }
 }
 
-void Load(string FileName,Player& Character){
+void Load(string FileName){
     Maze.clear();
     ifstream File(FileName.c_str(),ios::in|ios::binary);
     unsigned int Size=0u;
@@ -53,18 +48,24 @@ void Load(string FileName,Player& Character){
         File.read((char*)&Tile.second,1u);
         Maze.insert(Tile);
     }
-    Character.Load(File);
     File.read((char*)&Size,4u);
     for(unsigned int i=0u;i<Size;i++){
-        Lazer* L = new Lazer();
-        Lazer::Lazers.push_back(L);
-        L->Load(File);
-    }
-    File.read((char*)&Size,4u);
-    for(unsigned int i=0u;i<Size;i++){
-        Enemy* E = new Enemy();
-        Enemy::Enemies.push_back(E);
-        E->Load(File);
+        char C=File.peek();
+        switch(C){
+            case 'E':{// Enemy
+                (new Enemy)->Load(File);
+                break;
+            }case 'L':{// Lazer
+                (new Lazer)->Load(File);
+                break;
+            }case 'P':{// Player
+                Player::Character->Load(File);
+                break;
+            }default:{
+                exit(4);
+                break;
+            }
+        }
     }
 }
 

@@ -2,7 +2,11 @@
 #define PLAYER_HPP
 class Player:public Entity{
     int Score;
+protected:
+    // Destructor
+    ~Player();
 public:
+    static Player* Character;
     static maze Pathing;
     static maze Sight;
     // Variables
@@ -16,8 +20,6 @@ public:
     sf::String& High;
     // Constructor
     Player(sf::String& T,sf::String& B,sf::String& H);
-    // Destructor
-    ~Player();
     // Functions
     void Update();
     bool MoveTo(pairi Loc);
@@ -29,5 +31,6 @@ public:
     bool InSight(pairi Loc);
     void Save(ofstream& File)const;
     void Load(ifstream& File);
+    bool Remove()const;
 };
 #endif // PLAYER_HPP

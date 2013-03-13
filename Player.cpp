@@ -1,9 +1,12 @@
 #include "main.hpp"
 
+Player* Player::Character;
 maze Player::Pathing;
 maze Player::Sight;
 
-Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity(0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),Bullets(B),High(H){}
+Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),Bullets(B),High(H){
+    Character=this;
+}
 
 Player::~Player(){}
 
@@ -12,7 +15,7 @@ void Player::Update(){
         oX=X;
         oY=Y;
         EvalMaze(Pathing,pairi(X,Y),25,{1,4});
-        EvalMaze(Sight,pairi(X,Y),6,{1});
+        EvalMaze(Sight,pairi(X,Y),5,{1});
     }
     if(Timer)Timer--;
     else{
@@ -55,7 +58,7 @@ void Player::Shoot(pairi Direction){
             if(T==1||T==4){
                 return;
             }else{
-                Lazer::New(C,1);
+                new Lazer(C,1);
             }
         }else{
             return;
@@ -102,4 +105,8 @@ void Player::Load(ifstream& File){
     EvalMaze(Sight,pairi(X,Y),6,{1});
     Bullets.SetText(" Bullets: "+ToString(Shots));
     High.SetText("  High Score: "+ToString(HScore));
+}
+
+bool Player::Remove()const{
+    return false;
 }
