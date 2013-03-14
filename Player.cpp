@@ -6,6 +6,9 @@ maze Player::Sight;
 
 Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),Bullets(B),High(H){
     Character=this;
+    Bullets.SetText(" Bullets: "+ToString(Shots));
+    High.SetText("  High Score: "+ToString(HScore));
+    Text.SetText("Score: "+ToString(Score));
 }
 
 Player::~Player(){}
@@ -71,7 +74,7 @@ void Player::Point(int Change){
     Text.SetText("Score: "+ToString(Score));
     if(Score>HScore){
         HScore=Score;
-        High.SetText("  High Score: "+ToString(HScore));
+        High.SetText(" High Score: "+ToString(HScore));
     }
 }
 
@@ -105,6 +108,7 @@ void Player::Load(ifstream& File){
     EvalMaze(Sight,pairi(X,Y),6,{1});
     Bullets.SetText(" Bullets: "+ToString(Shots));
     High.SetText("  High Score: "+ToString(HScore));
+    Text.SetText("Score: "+ToString(Score));
 }
 
 bool Player::Remove()const{

@@ -3,6 +3,7 @@ const sf::Color HighLight(32,32,32);
 maze Maze;
 int GameTime=0;
 pairi Adj[8]={pairi(-1,0),pairi(1,0),pairi(0,-1),pairi(0,1),pairi(1,1),pairi(-1,1),pairi(-1,-1),pairi(1,-1)};
+bool Menu=false;
 
 int main(){
     srand(time(NULL));
@@ -20,8 +21,8 @@ int main(){
     sf::String Bullets(" Bullets: 3",Font,TileSize);
     sf::String HighScore(" HighScore: 0",Font,TileSize);
     sf::PostFX MenuGray;
-    new Player(ScoreTxt,Bullets,HighScore);
     bool Draw=false;
+    new Player(ScoreTxt,Bullets,HighScore);
     map<sf::Key::Code,pairi> MoveKeys={{sf::Key::W,pairi(0,-1)},{sf::Key::S,pairi(0,1)},{sf::Key::A,pairi(-1,0)},{sf::Key::D,pairi(1,0)}};
     map<sf::Key::Code,pairi> ShootKeys={{sf::Key::Up,pairi(0,-1)},{sf::Key::Down,pairi(0,1)},{sf::Key::Left,pairi(-1,0)},{sf::Key::Right,pairi(1,0)}};
     // Setup
@@ -45,13 +46,18 @@ int main(){
     }
     MenuGray.SetTexture("framebuffer", NULL);
     // Game Loop
-    if(FileExists("SaveGame.zs"))Load("SaveGame.zs");
+    if(FileExists("SaveGame.zs")){
+        Load("SaveGame.zs");
+        Menu=true;
+    }
     while(App.IsOpened()){
         // Update Time
-        Tick--;
-        if(!Tick){
-            Tick=30;
-            GameTime++;
+        if(!Menu){
+            Tick--;
+            if(!Tick){
+                Tick=30;
+                GameTime++;
+            }
         }
         // Clear Old Scene;
         App.Clear();
@@ -62,13 +68,16 @@ int main(){
                     break;
                 }case sf::Event::KeyPressed:{
                     sf::Key::Code Key=Events.Key.Code;
-                    if(MoveKeys.count(Key)){
+                    if(!Menu&&MoveKeys.count(Key)){
                         Player::Character->Move(MoveKeys[Key]);
-                    }else if(ShootKeys.count(Key)){
+                    }else if(!Menu&&ShootKeys.count(Key)){
                         Player::Character->Shoot(ShootKeys[Key]);
                     }else{
                         switch(Key){
-                            case sf::Key::Escape:{
+                            case sf::Key::P:{
+                                Menu=!Menu;
+                                break;
+                            }case sf::Key::Escape:{
                                 App.Close();
                                 break;
                             }default:{break;}
@@ -105,7 +114,7 @@ int main(){
         }
         // Update and Draw Entities
         Entity::Tick(App);
-        App.Draw(MenuGray);
+        if(Menu)App.Draw(MenuGray);
         // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,SWidth,SHeight));
         float W=ScoreTxt.GetRect().GetWidth();

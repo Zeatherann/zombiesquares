@@ -52,6 +52,7 @@ extern const sf::Color HighLight;
 extern maze Maze;
 extern int GameTime;
 extern pairi Adj[8];
+extern bool Menu;
 /// Global Functions
 int main();
 //-----
