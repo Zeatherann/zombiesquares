@@ -1,5 +1,14 @@
 #include "main.hpp"
 
+void NewMaze(){
+    Maze.clear();
+    int Area=3;
+    Entity::Clear();
+    GameTime=0;
+    for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?3:0;
+    for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
+}
+
 void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
     int Step=1;
     Tiles.clear();

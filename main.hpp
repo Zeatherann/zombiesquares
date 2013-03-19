@@ -43,7 +43,7 @@ extern const sf::Color HighLight;
 extern maze Maze;
 extern int GameTime;
 extern pairi Adj[8];
-extern bool MenuMode;
+extern char MenuMode; // 0: Playing, 1: Paused
 extern float WinWidth;
 extern float WinHeight;
 /// Global Functions

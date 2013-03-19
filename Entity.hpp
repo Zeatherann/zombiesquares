@@ -20,6 +20,7 @@ public:
     short Life;
     // Functions
     static void Tick(sf::RenderWindow& Window);
+    static void Clear();
     // -----
     void Draw(sf::RenderWindow& Window)const;
     virtual void Update()=0;

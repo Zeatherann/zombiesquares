@@ -9,6 +9,13 @@ Entity::Entity(char type,int x,int y,sf::Color color,short life):Type(type),X(x)
 
 Entity::~Entity(){}
 
+void Entity::Clear(){
+    for(Entity* Iter:Entities){
+        delete Iter;
+    }
+    Entities.clear();
+}
+
 void Entity::Tick(sf::RenderWindow& Window){
     set<Entity*> Remove;
     vector<Entity*> ToDraw,Lazers;
@@ -16,7 +23,7 @@ void Entity::Tick(sf::RenderWindow& Window){
         if(Iter->Remove()){
             Remove.insert(Iter);
         }else{
-            if(!MenuMode)Iter->Update();
+            if(MenuMode==0)Iter->Update();
             if(Iter->Type=='L')Lazers.push_back(Iter);
             else ToDraw.push_back(Iter);
         }

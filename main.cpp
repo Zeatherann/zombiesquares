@@ -3,7 +3,7 @@ const sf::Color HighLight(32,32,32);
 maze Maze;
 int GameTime=0;
 pairi Adj[8]={pairi(-1,0),pairi(1,0),pairi(0,-1),pairi(0,1),pairi(1,1),pairi(-1,1),pairi(-1,-1),pairi(1,-1)};
-bool MenuMode=false;
+char MenuMode=false;
 float WinWidth=1024;
 float WinHeight=768;
 
@@ -46,23 +46,54 @@ int main(){
     MenuGray.SetTexture("framebuffer",NULL);
     // Create Interface
     Menu* MenuPause;
+    Menu* MenuMain;
+    Menu* MenuNewGame;
+    Menu* MenuSaveGame;
     {
         sf::Vector2f Size(WinWidth*0.5f,TileSize);
         sf::Vector2f Location(WinWidth*0.25f,WinHeight*0.25f);
-        MenuPause=new Menu(Location,Size,0.f,sf::String("Paused",Font),sf::Shape::Rectangle({},{},sf::Color(0,0,0,64),1.f,sf::Color(0,0,255)));
+        MenuPause=new Menu(Location,Size,0.f,sf::String("Paused",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)));
         Size.x-=2.f;
         Size.y-=2.f;
-        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Resume Game",Font),[&]{MenuMode=false;}),sf::Color(0,0,255,128)),1,1);
-        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Save and Exit",Font),[&]{Save("SaveGame.zs");App.Close();}),sf::Color(0,0,255,128)),1);
+        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Resume Game",Font),[&]{MenuMode=0;}),sf::Color(0,0,255,128)),1);
+        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Save Game",Font),[&]{Save("SaveGame.zs");}),sf::Color(0,0,255,128)),1);
+        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit to Menu",Font),[&]{MenuMode=-2;MenuPause->Visible=false;MenuSaveGame->Visible=true;}),sf::Color(0,0,255,128)),1);
+        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit Game",Font),[&]{MenuMode=-1;MenuPause->Visible=false;MenuSaveGame->Visible=true;}),sf::Color(0,0,255,128)),1);
+        Size.x+=2.f;
+        Size.y+=2.f;
+        MenuMain=new Menu(Location,Size,0.f,sf::String("Zombie Squares",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
+        Size.x-=2.f;
+        Size.y-=2.f;
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("New Game",Font),[&]{MenuNewGame->Visible=true;MenuMain->Visible=false;}),sf::Color(0,0,255,128)),1);
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Load Game",Font),[&]{Entity::Clear();new Player(ScoreTxt,Bullets,HighScore);Load("SaveGame.zs");MenuMode=1;MenuPause->Visible=true;MenuMain->Visible=false;}),sf::Color(0,0,255,128)),1);
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Create Maze",Font),NULL),sf::Color(255,0,0,128)),1);
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Highscores",Font),NULL),sf::Color(255,0,0,128)),1);
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Options",Font),NULL),sf::Color(255,0,0,128)),1,1);
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit Game",Font),[&]{App.Close();}),sf::Color(0,0,255,128)),1);
+        Size.x+=2.f;
+        Size.y+=2.f;
+        MenuNewGame=new Menu(Location,Size,0.f,sf::String("New Game",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
+        Size.x-=2.f;
+        Size.y-=2.f;
+        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Random Maze",Font),[&]{NewMaze();new Player(ScoreTxt,Bullets,HighScore);MenuMode=0;MenuPause->Visible=true;MenuNewGame->Visible=false;}),sf::Color(0,0,255,128)),1);
+        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Load Maze",Font),NULL),sf::Color(255,0,0,128)),1);
+        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Cancel",Font),[&]{MenuMode=2;MenuNewGame->Visible=false;MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
+        Size.x+=2.f;
+        Size.y+=2.f;
+        MenuSaveGame=new Menu(Location,Size,0.f,sf::String("Save Before Exiting",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
+        Size.x-=2.f;
+        Size.y-=2.f;
+        MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Save Maze",Font),[&]{Save("SaveGame.zs");MenuSaveGame->Visible=false;if(MenuMode==-1)App.Close();else MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
+        MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Don't Save Maze",Font),[&]{MenuSaveGame->Visible=false;if(MenuMode==-1)App.Close();else MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
     }
     // Game Loop
     if(FileExists("SaveGame.zs")){
         Load("SaveGame.zs");
-        MenuMode=true;
+        MenuMode=1;
     }
     while(App.IsOpened()){
         // Update Time
-        if(!MenuMode){
+        if(MenuMode==0){
             Tick--;
             if(!Tick){
                 Tick=30;
@@ -72,7 +103,7 @@ int main(){
         // Clear Old Scene;
         App.Clear();
         while(App.GetEvent(Events)){ // EVENTS
-            if(MenuMode)UIGroup::GetAllInput(Events,App.GetInput());
+            if(MenuMode!=0)UIGroup::GetAllInput(Events,App.GetInput());
             switch(Events.Type){
                 case sf::Event::Closed:{
                     App.Close();
@@ -81,7 +112,11 @@ int main(){
                     WinWidth=Events.Size.Width;
                     WinHeight=Events.Size.Height;
                     // Move Interfaces
-                    MenuPause->Move(sf::Vector2f((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f));
+                    sf::Vector2f NewLoc((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f);
+                    MenuPause->Move(NewLoc);
+                    MenuSaveGame->Move(NewLoc);
+                    MenuMain->Move(NewLoc);
+                    MenuNewGame->Move(NewLoc);
                     break;
                 }case sf::Event::MouseWheelMoved:{
                     int Old=Player::SightRadius+Events.MouseWheel.Delta;
@@ -89,14 +124,15 @@ int main(){
                     break;
                 }case sf::Event::KeyPressed:{
                     sf::Key::Code Key=Events.Key.Code;
-                    if(!MenuMode&&MoveKeys.count(Key)){
+                    if(MenuMode==0&&MoveKeys.count(Key)){
                         Player::Character->Move(MoveKeys[Key]);
-                    }else if(!MenuMode&&ShootKeys.count(Key)){
+                    }else if(MenuMode==0&&ShootKeys.count(Key)){
                         Player::Character->Shoot(ShootKeys[Key]);
                     }else{
                         switch(Key){
                             case sf::Key::Escape:{
-                                MenuMode=!MenuMode;
+                                if(MenuMode==0)MenuMode=1;
+                                else if(MenuMode==1)MenuMode=0;
                                 break;
                             }default:{break;}
                         }
@@ -137,10 +173,10 @@ int main(){
         }
         // Update and Draw Entities
         Entity::Tick(App);
-        if(MenuMode)App.Draw(MenuGray);
+        if(MenuMode!=0)App.Draw(MenuGray);
         // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,WinWidth,WinHeight));
-        if(MenuMode)UIGroup::DrawAll(App);
+        if(MenuMode!=0)UIGroup::DrawAll(App);
         float W=ScoreTxt.GetRect().GetWidth();
         // Draw HighScore
         HighScore.SetPosition(W+Bullets.GetRect().GetWidth(),0);
