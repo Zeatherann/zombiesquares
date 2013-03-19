@@ -40,6 +40,7 @@ void Menu::AddButton(Button* Child,char Style,int ExtraSteps){
         Child->Location=Location+sf::Vector2f(Edge+Extra,Size.y+NextPos.x+Extra+Buffer);
         NewPos=&NextPos.x;
     }
+    Child->Move(Child->Location);
     Change*=Child->Size.y+Extra*2.f+Buffer;
     (*NewPos)+=Change;
 //    *(NP[4u])+=Change;

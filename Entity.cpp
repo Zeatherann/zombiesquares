@@ -30,10 +30,7 @@ void Entity::Tick(sf::RenderWindow& Window){
         int X=Player::Character->X;
         int Y=Player::Character->Y;
         for(Entity* Iter:ToDraw){
-            if(Iter->Type=='P'){
-                Entity::Tile.SetColor(sf::Color::White);
-                Iter->Draw(Window);
-            }else{
+            if(Iter->Type!='P'){
                 pairi Loc(Iter->X,Iter->Y);
                 if(abs(Iter->X-X)<(Player::SightRadius+1)&&abs(Iter->Y-Y)<(Player::SightRadius+1)&&Player::Character->InSight(Loc)){
                     char Sight=Player::Character->GetSight(Loc);
@@ -43,6 +40,9 @@ void Entity::Tick(sf::RenderWindow& Window){
                     Entity::Tile.SetColor(sf::Color(255,255,255,Alpha));
                     Iter->Draw(Window);
                 }
+            }else{
+                Entity::Tile.SetColor(sf::Color::White);
+                Iter->Draw(Window);
             }
         }
     }
