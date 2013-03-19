@@ -42,18 +42,29 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Button.cpp" />
+		<Unit filename="Button.hpp" />
 		<Unit filename="Enemy.cpp" />
 		<Unit filename="Enemy.hpp" />
 		<Unit filename="Entity.cpp" />
 		<Unit filename="Entity.hpp" />
 		<Unit filename="Lazer.cpp" />
 		<Unit filename="Lazer.hpp" />
+		<Unit filename="Maze.cpp" />
+		<Unit filename="Maze.hpp" />
 		<Unit filename="Maze1.txt" />
+		<Unit filename="Menu.cpp" />
+		<Unit filename="Menu.hpp" />
+		<Unit filename="MenuEffect.sfx" />
 		<Unit filename="Player.cpp" />
 		<Unit filename="Player.hpp" />
 		<Unit filename="README.txt" />
 		<Unit filename="Saving.cpp" />
 		<Unit filename="Saving.hpp" />
+		<Unit filename="UIElement.cpp" />
+		<Unit filename="UIElement.hpp" />
+		<Unit filename="UIGroup.cpp" />
+		<Unit filename="UIGroup.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.hpp" />
 		<Extensions>

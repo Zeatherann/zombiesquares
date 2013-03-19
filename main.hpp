@@ -6,15 +6,8 @@
 #include <SFML/Graphics.hpp>
 #include <Vanyel/Vanyel.hpp>
 
-#define TileSize (32.f)
-#define WinHeight (768)
-#define Width (21.f)
-#define Height (15.f)
-#define SWidth (TileSize*Width)
-#define SHeight (TileSize*Height)
-#define CWidth (10.f)
-#define CHeight (7.f)
-#define TileNum (5)
+#define TileSize 32.f
+#define TileNum (4u) // Ground, Wall, Point Square, Starting Wall
 /// Namespaces
 using namespace std;
 namespace Data{
@@ -30,8 +23,6 @@ template<typename Type>inline Chunk In(const Type& Input){
 inline Chunk In(const std::string& Input){
     return Chunk((char*)Input.c_str(),Input.size());
 }
-
-ifstream& LoadChunk(Chunk& Block,ifstream& File);
 
 // from bytes
 
@@ -52,13 +43,12 @@ extern const sf::Color HighLight;
 extern maze Maze;
 extern int GameTime;
 extern pairi Adj[8];
+extern bool MenuMode;
+extern float WinWidth;
+extern float WinHeight;
 /// Global Functions
 int main();
 //-----
-char MakeTile(maze& Tiles,int x,int y);
-inline char GetTile(maze& Tiles,int x,int y){
-    return Tiles.count(pairi(x,y))?Tiles[pairi(x,y)]:MakeTile(Tiles,x,y);
-}
 // Templates
 template<typename Type>inline set<Type>& operator+=(set<Type>& L,const set<Type>& R){
     L.insert(R.begin(),R.end());
@@ -71,11 +61,25 @@ template<typename Type1,typename Type2>inline ostream& operator<<(ostream& L,con
     return L<<"("<<R.first<<", "<<R.second<<")";
 }
 // Operators
-
+inline sf::Color operator/(const sf::Color& L,const unsigned char& R){
+    return sf::Color(L.r/R,L.g/R,L.b/R);
+}
+inline sf::Color operator*(const sf::Color& L,const unsigned char& R){
+    return sf::Color(L.r*R,L.g*R,L.b*R);
+}
+inline sf::Color operator-(const sf::Color& L,const sf::Color& R){
+    return sf::Color(L.r<R.r?0:L.r-R.r,L.g<R.g?0:L.g-R.g,L.b<R.b?0:L.b-R.b);
+}
 /// Project Files
+#include "Maze.hpp"
 #include "Entity.hpp"
 #include "Lazer.hpp"
 #include "Player.hpp"
 #include "Enemy.hpp"
 #include "Saving.hpp"
+#include "UIElement.hpp"
+#include "Button.hpp"
+Button* ButtonStyle(Button* B,sf::Color Base);
+#include "UIGroup.hpp"
+#include "Menu.hpp"
 #endif // MazePathing
