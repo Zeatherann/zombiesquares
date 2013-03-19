@@ -31,6 +31,7 @@ public:
     void Shoot(pairi Direction);
     void Point(int Change);
     bool InSight(pairi Loc);
+    char GetSight(pairi Loc);
     void Save(ofstream& File)const;
     void Load(ifstream& File);
     bool Remove()const;

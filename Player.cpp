@@ -4,7 +4,7 @@ Player* Player::Character;
 maze Player::Pathing;
 maze Player::Sight;
 int Player::AggroRadius=25;
-int Player::SightRadius=5;
+int Player::SightRadius=6;
 
 Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),Bullets(B),High(H){
     Character=this;
@@ -88,6 +88,18 @@ bool Player::InSight(pairi Loc){
         }
     }
     return false;
+}
+
+char Player::GetSight(pairi Loc){
+    if(Sight.count(Loc))return Sight[Loc];
+    else{
+        char Ret=-1;
+        for(unsigned int i=0u;i<8u;i++){
+            pairi P(Loc.first+Adj[i].first,Loc.second+Adj[i].second);
+            if(Sight.count(P)&&(Ret==-1||Sight[P]<Ret))Ret=Sight[P];
+        }
+        return Ret;
+    }
 }
 
 void Player::Save(ofstream& File)const{

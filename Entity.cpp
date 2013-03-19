@@ -11,22 +11,40 @@ Entity::~Entity(){}
 
 void Entity::Tick(sf::RenderWindow& Window){
     set<Entity*> Remove;
-    set<Entity*> Lazers;
+    vector<Entity*> ToDraw,Lazers;
     for(Entity* Iter:Entities){
         if(Iter->Remove()){
             Remove.insert(Iter);
         }else{
             if(!MenuMode)Iter->Update();
-            if(Iter->Type=='L')Lazers.insert(Iter);
+            if(Iter->Type=='L')Lazers.push_back(Iter);
+            else ToDraw.push_back(Iter);
         }
     }
+    ToDraw.insert(ToDraw.end(),Lazers.begin(),Lazers.end());
     if(Remove.size())for(Entity* Iter:Remove){
         Entities.erase(Iter);
         delete Iter;
     }
     if(Player::Character){
-        for(Entity* Iter:Entities)if(Lazers.count(Iter)==0&&(Iter->Type=='P'||(Player::Character->InSight(pairi(Iter->X,Iter->Y)))))Iter->Draw(Window);
-        for(Entity* Iter:Lazers)if(Iter->Type=='P'||(Player::Character->InSight(pairi(Iter->X,Iter->Y))))Iter->Draw(Window);
+        int X=Player::Character->X;
+        int Y=Player::Character->Y;
+        for(Entity* Iter:ToDraw){
+            if(Iter->Type=='P'){
+                Entity::Tile.SetColor(sf::Color::White);
+                Iter->Draw(Window);
+            }else{
+                pairi Loc(Iter->X,Iter->Y);
+                if(abs(Iter->X-X)<(Player::SightRadius+1)&&abs(Iter->Y-Y)<(Player::SightRadius+1)&&Player::Character->InSight(Loc)){
+                    char Sight=Player::Character->GetSight(Loc);
+                    float Alpha=255.f*(1.f-(float(Sight)/float(Player::SightRadius+1)));
+                    if(Alpha>255.f)Alpha=255.f;
+                    if(Alpha<0.f)Alpha=0.f;
+                    Entity::Tile.SetColor(sf::Color(255,255,255,Alpha));
+                    Iter->Draw(Window);
+                }
+            }
+        }
     }
 }
 

@@ -17,7 +17,7 @@ int main(){
     sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Zombie Squares");
     sf::View Cam(sf::FloatRect(0.f,0.f,WinWidth,WinHeight));
     sf::Event Events;
-    sf::Color Tiles[TileNum]={sf::Color::Black,sf::Color::Blue,sf::Color(0,128,0),sf::Color(64,64,128)};
+    sf::Color Tiles[TileNum]={sf::Color::Black,sf::Color(0,0,128),sf::Color(0,128,0),sf::Color(64,64,128)};
     sf::Font Font;
     sf::String ScoreTxt("Score: 0",Font,TileSize);
     sf::String Bullets(" Bullets: 3",Font,TileSize);
@@ -83,6 +83,10 @@ int main(){
                     // Move Interfaces
                     MenuPause->Move(sf::Vector2f((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f));
                     break;
+                }case sf::Event::MouseWheelMoved:{
+                    int Old=Player::SightRadius+Events.MouseWheel.Delta;
+                    if(Old>=0)Player::SightRadius=Old;
+                    break;
                 }case sf::Event::KeyPressed:{
                     sf::Key::Code Key=Events.Key.Code;
                     if(!MenuMode&&MoveKeys.count(Key)){
@@ -117,10 +121,17 @@ int main(){
         int SR=Player::SightRadius+1;
         for(int x=X-SR;x<=X+SR;x++){
             for(int y=Y-SR;y<=Y+SR;y++){
-                if(Player::Character->InSight(pairi(x,y))){
+                pairi Loc(x,y);
+                if(Player::Character->InSight(Loc)){
                     unsigned int Index=GetTile(Maze,x,y);
-                    Squares[Index].SetPosition(x*TileSize,y*TileSize);
-                    App.Draw(Squares[Index]);
+                    sf::Shape& Sq=Squares[Index];
+                    char Sight=Player::Character->GetSight(Loc);
+                    float Alpha=255.f*(1.f-(float(Sight)/float(Player::SightRadius+1)));
+                    if(Alpha>255.f)Alpha=255.f;
+                    if(Alpha<0.f)Alpha=0.f;
+                    Sq.SetColor(sf::Color(255,255,255,Alpha));
+                    Sq.SetPosition(x*TileSize,y*TileSize);
+                    App.Draw(Sq);
                 }
             }
         }
