@@ -44,7 +44,7 @@ extern const sf::Color HighLight;
 extern maze Maze;
 extern int GameTime;
 extern pairi Adj[8];
-extern char MenuMode; // 0: Playing, 1: Paused
+extern char MenuMode; // 0: Playing, 1: Paused, 2: Main Menu, 3: Game Over, -1: Quit to Main Menu, -2: Quit Game
 extern float WinWidth;
 extern float WinHeight;
 /// Global Functions

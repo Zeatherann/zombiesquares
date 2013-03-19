@@ -49,6 +49,7 @@ int main(){
     Menu* MenuMain;
     Menu* MenuNewGame;
     Menu* MenuSaveGame;
+    Menu* MenuGameOver;
     {
         sf::Vector2f Size(WinWidth*0.5f,TileSize);
         sf::Vector2f Location(WinWidth*0.25f,WinHeight*0.25f);
@@ -86,6 +87,13 @@ int main(){
         MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Save Maze",Font),[&]{Save("SaveGame.zs");MenuSaveGame->Visible=false;if(MenuMode==-1)App.Close();else MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
         MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Don't Save Maze",Font),[&]{MenuSaveGame->Visible=false;if(MenuMode==-1)App.Close();else MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
         MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Cancel",Font),[&]{MenuMode=1;MenuSaveGame->Visible=false;MenuPause->Visible=true;}),sf::Color(0,0,255,128)),1);
+        Size.x+=2.f;
+        Size.y+=2.f;
+        MenuGameOver=new Menu(Location,Size,0.f,sf::String("Game Over",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
+        Size.x-=2.f;
+        Size.y-=2.f;
+        MenuGameOver->AddButton(ButtonStyle(new Button({},Size,sf::String("Play Again",Font),[&]{MenuGameOver->Visible=false;MenuMain->Visible=true;MenuMode=2;}),sf::Color(0,0,255,128)),1);
+        MenuGameOver->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit",Font),[&]{App.Close();}),sf::Color(0,0,255,128)),1);
     }
     // Game Loop
     if(FileExists("SaveGame.zs")){
@@ -118,6 +126,7 @@ int main(){
                     MenuSaveGame->Move(NewLoc);
                     MenuMain->Move(NewLoc);
                     MenuNewGame->Move(NewLoc);
+                    MenuGameOver->Move(NewLoc);
                     break;
                 }case sf::Event::MouseWheelMoved:{
                     int Old=Player::SightRadius+Events.MouseWheel.Delta;
@@ -131,7 +140,9 @@ int main(){
                         Player::Character->Shoot(ShootKeys[Key]);
                     }else{
                         switch(Key){
-                            case sf::Key::Escape:{
+                            case sf::Key::W:{
+                                Player::Character->Shots=10;
+                            }case sf::Key::Escape:{
                                 if(MenuMode==0)MenuMode=1;
                                 else if(MenuMode==1)MenuMode=0;
                                 break;
@@ -145,8 +156,10 @@ int main(){
         // Check Window
         if(!App.IsOpened())break;
         // Update Game View
-        X=Player::Character->X;
-        Y=Player::Character->Y;
+        if(Player::Character){
+            X=Player::Character->X;
+            Y=Player::Character->Y;
+        }
         {
             float Ratio=WinHeight/WinWidth;
             float S=(Player::SightRadius+1)*TileSize;
@@ -174,6 +187,14 @@ int main(){
         }
         // Update and Draw Entities
         Entity::Tick(App);
+        if(!Player::Character&&MenuMode==0){
+            MenuMode=3;
+            MenuGameOver->Visible=true;
+            MenuPause->Visible=false;
+            MenuSaveGame->Visible=false;
+            MenuMain->Visible=false;
+            MenuNewGame->Visible=false;
+        }
         if(MenuMode!=0)App.Draw(MenuGray);
         // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,WinWidth,WinHeight));

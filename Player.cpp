@@ -13,7 +13,9 @@ Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity('P',0,0,sf::Col
     Text.SetText("Score: "+ToString(Score));
 }
 
-Player::~Player(){}
+Player::~Player(){
+    if(Character==this)Character=NULL;
+}
 
 void Player::Update(){
     if(oX!=X||oY!=Y){
@@ -126,5 +128,5 @@ void Player::Load(ifstream& File){
 }
 
 bool Player::Remove()const{
-    return false;
+    return Score<0;
 }
