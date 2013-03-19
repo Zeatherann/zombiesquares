@@ -6,7 +6,7 @@ protected:
     Entity(char type='\0',int x=0,int y=0,sf::Color color=sf::Color::White,short life=1);
     Entity(const Entity&);
     // Destructor
-    ~Entity();
+    virtual ~Entity();
     // Functions
     Entity& operator=(const Entity&);
 public:

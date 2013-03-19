@@ -3,8 +3,9 @@
 /// Defines
 /// Libraries
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <SFML/Graphics.hpp>
-#include <Vanyel/Vanyel.hpp>
 
 #define TileSize 32.f
 #define TileNum (4u) // Ground, Wall, Point Square, Starting Wall
@@ -50,6 +51,19 @@ extern float WinHeight;
 int main();
 //-----
 // Templates
+template<typename T> std::string ToString(T number){
+    std::stringstream S;
+    S<<number;
+    return S.str();
+}
+
+template<typename T> T ToNumber(std::string str){
+    std::stringstream S;
+    S<<str;
+    T Ret;
+    S>>Ret;
+    return Ret;
+}
 template<typename Type>inline set<Type>& operator+=(set<Type>& L,const set<Type>& R){
     L.insert(R.begin(),R.end());
     return L;

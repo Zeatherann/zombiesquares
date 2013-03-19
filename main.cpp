@@ -85,6 +85,7 @@ int main(){
         Size.y-=2.f;
         MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Save Maze",Font),[&]{Save("SaveGame.zs");MenuSaveGame->Visible=false;if(MenuMode==-1)App.Close();else MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
         MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Don't Save Maze",Font),[&]{MenuSaveGame->Visible=false;if(MenuMode==-1)App.Close();else MenuMain->Visible=true;}),sf::Color(0,0,255,128)),1);
+        MenuSaveGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Cancel",Font),[&]{MenuMode=1;MenuSaveGame->Visible=false;MenuPause->Visible=true;}),sf::Color(0,0,255,128)),1);
     }
     // Game Loop
     if(FileExists("SaveGame.zs")){

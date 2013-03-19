@@ -10,7 +10,7 @@ public:
     // Constructor
     UIGroup(bool vis=true);
     // Destructor
-    ~UIGroup();
+    virtual ~UIGroup();
     // Functions
     virtual void GetInput(sf::Event MouseEvent,const sf::Input& State);
     virtual void Draw(sf::RenderWindow& Window);

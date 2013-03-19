@@ -12,7 +12,7 @@ public:
     // Constructor
     UIElement(sf::Vector2f L,sf::Vector2f S);
     // Destructor
-    ~UIElement();
+    virtual ~UIElement();
     // Functions
     virtual void GetInput(sf::Event MouseEvent,const sf::Input& State);
     virtual void Draw(sf::RenderWindow& Window)=0;
