@@ -9,6 +9,8 @@ public:
     static Player* Character;
     static maze Pathing;
     static maze Sight;
+    static int AggroRadius;
+    static int SightRadius;
     // Variables
     int HScore;
     int oX;

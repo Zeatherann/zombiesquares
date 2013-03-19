@@ -16,7 +16,7 @@ void Entity::Tick(sf::RenderWindow& Window){
         if(Iter->Remove()){
             Remove.insert(Iter);
         }else{
-            if(!Menu)Iter->Update();
+            if(!MenuMode)Iter->Update();
             if(Iter->Type=='L')Lazers.insert(Iter);
         }
     }

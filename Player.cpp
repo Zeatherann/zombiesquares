@@ -3,6 +3,8 @@
 Player* Player::Character;
 maze Player::Pathing;
 maze Player::Sight;
+int Player::AggroRadius=25;
+int Player::SightRadius=5;
 
 Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),Bullets(B),High(H){
     Character=this;
@@ -17,8 +19,8 @@ void Player::Update(){
     if(oX!=X||oY!=Y){
         oX=X;
         oY=Y;
-        EvalMaze(Pathing,pairi(X,Y),25,{1,4});
-        EvalMaze(Sight,pairi(X,Y),5,{1});
+        EvalMaze(Pathing,pairi(X,Y),AggroRadius,{1,3});
+        EvalMaze(Sight,pairi(X,Y),SightRadius,{1});
     }
     if(Timer)Timer--;
     else{
@@ -39,9 +41,9 @@ bool Player::MoveTo(pairi Loc){
         Point(1);
         Maze[Loc]=0;
     }
-    if(T==4){
+    if(T==3){
         for(pair<const pairi,char>& Iter:Maze){
-            if(Iter.second==4){
+            if(Iter.second==3){
                 Iter.second=0;
             }
         }
@@ -82,9 +84,7 @@ bool Player::InSight(pairi Loc){
     if(Sight.count(Loc))return true;
     else{
         for(unsigned int i=0u;i<8u;i++){
-            if(Sight.count(Loc+Adj[i])){
-                return true;
-            }
+            if(Sight.count(Loc+Adj[i]))return true;
         }
     }
     return false;
@@ -104,8 +104,10 @@ void Player::Load(ifstream& File){
     File.read((char*)&HScore,4u);
     File.read((char*)&Timer,4u);
     File.read((char*)&Shots,4u);
-    EvalMaze(Pathing,pairi(X,Y),25,{1,4});
-    EvalMaze(Sight,pairi(X,Y),6,{1});
+    oX=X;
+    oY=Y;
+    EvalMaze(Pathing,pairi(X,Y),AggroRadius,{1,3});
+    EvalMaze(Sight,pairi(X,Y),SightRadius,{1});
     Bullets.SetText(" Bullets: "+ToString(Shots));
     High.SetText("  High Score: "+ToString(HScore));
     Text.SetText("Score: "+ToString(Score));

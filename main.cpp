@@ -3,7 +3,9 @@ const sf::Color HighLight(32,32,32);
 maze Maze;
 int GameTime=0;
 pairi Adj[8]={pairi(-1,0),pairi(1,0),pairi(0,-1),pairi(0,1),pairi(1,1),pairi(-1,1),pairi(-1,-1),pairi(1,-1)};
-bool Menu=false;
+bool MenuMode=false;
+float WinWidth=1024;
+float WinHeight=768;
 
 int main(){
     srand(time(NULL));
@@ -12,25 +14,22 @@ int main(){
     int Y=0;
     int Tick=30;
     sf::Shape Squares[TileNum];
-    sf::RenderWindow App({(int)(float(WinHeight)*(Width/Height)),WinHeight,32},"Zombie Squares");
-    sf::View Cam(sf::FloatRect(0.f,0.f,SWidth,SHeight));
+    sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Zombie Squares");
+    sf::View Cam(sf::FloatRect(0.f,0.f,WinWidth,WinHeight));
     sf::Event Events;
-    sf::Color Tiles[TileNum]={sf::Color::Black,sf::Color::Blue,sf::Color(0,128,0),sf::Color(255,255,255,0),sf::Color(64,64,128)};
+    sf::Color Tiles[TileNum]={sf::Color::Black,sf::Color::Blue,sf::Color(0,128,0),sf::Color(64,64,128)};
     sf::Font Font;
     sf::String ScoreTxt("Score: 0",Font,TileSize);
     sf::String Bullets(" Bullets: 3",Font,TileSize);
     sf::String HighScore(" HighScore: 0",Font,TileSize);
     sf::PostFX MenuGray;
-    bool Draw=false;
     new Player(ScoreTxt,Bullets,HighScore);
     map<sf::Key::Code,pairi> MoveKeys={{sf::Key::W,pairi(0,-1)},{sf::Key::S,pairi(0,1)},{sf::Key::A,pairi(-1,0)},{sf::Key::D,pairi(1,0)}};
     map<sf::Key::Code,pairi> ShootKeys={{sf::Key::Up,pairi(0,-1)},{sf::Key::Down,pairi(0,1)},{sf::Key::Left,pairi(-1,0)},{sf::Key::Right,pairi(1,0)}};
     // Setup
-    sf::IntRect StartArea(-3,-3,3,3);
-    for(int a=StartArea.Left;a<=StartArea.Right;a++){ // Create Starting Area
-        for(int b=StartArea.Top;b<=StartArea.Bottom;b++){
-            Maze[pairi(a,b)]=a==StartArea.Left||a==StartArea.Right||b==StartArea.Top||b==StartArea.Bottom?4:0;
-        }
+    { // Create Starting Area
+        int Area=3;
+        for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?3:0;
     }
     App.SetView(Cam);
     App.SetFramerateLimit(30);
@@ -44,15 +43,26 @@ int main(){
         cout<<"Unable to load file \'MenuEffect.sfx\'!"<<endl;
         exit(10);
     }
-    MenuGray.SetTexture("framebuffer", NULL);
+    MenuGray.SetTexture("framebuffer",NULL);
+    // Create Interface
+    Menu* MenuPause;
+    {
+        sf::Vector2f Size(WinWidth*0.5f,TileSize);
+        sf::Vector2f Location(WinWidth*0.25f,WinHeight*0.25f);
+        MenuPause=new Menu(Location,Size,0.f,sf::String("Paused",Font),sf::Shape::Rectangle({},{},sf::Color(0,0,0,64),1.f,sf::Color(0,0,255)));
+        Size.x-=2.f;
+        Size.y-=2.f;
+        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Resume Game",Font),[&]{MenuMode=false;}),sf::Color(0,0,255,128)),1,1);
+        MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Save and Exit",Font),[&]{Save("SaveGame.zs");App.Close();}),sf::Color(0,0,255,128)),1);
+    }
     // Game Loop
     if(FileExists("SaveGame.zs")){
         Load("SaveGame.zs");
-        Menu=true;
+        MenuMode=true;
     }
     while(App.IsOpened()){
         // Update Time
-        if(!Menu){
+        if(!MenuMode){
             Tick--;
             if(!Tick){
                 Tick=30;
@@ -62,23 +72,27 @@ int main(){
         // Clear Old Scene;
         App.Clear();
         while(App.GetEvent(Events)){ // EVENTS
+            if(MenuMode)UIGroup::GetAllInput(Events,App.GetInput());
             switch(Events.Type){
                 case sf::Event::Closed:{
                     App.Close();
                     break;
+                }case sf::Event::Resized:{
+                    WinWidth=Events.Size.Width;
+                    WinHeight=Events.Size.Height;
+                    // Move Interfaces
+                    MenuPause->Move(sf::Vector2f((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f));
+                    break;
                 }case sf::Event::KeyPressed:{
                     sf::Key::Code Key=Events.Key.Code;
-                    if(!Menu&&MoveKeys.count(Key)){
+                    if(!MenuMode&&MoveKeys.count(Key)){
                         Player::Character->Move(MoveKeys[Key]);
-                    }else if(!Menu&&ShootKeys.count(Key)){
+                    }else if(!MenuMode&&ShootKeys.count(Key)){
                         Player::Character->Shoot(ShootKeys[Key]);
                     }else{
                         switch(Key){
-                            case sf::Key::P:{
-                                Menu=!Menu;
-                                break;
-                            }case sf::Key::Escape:{
-                                App.Close();
+                            case sf::Key::Escape:{
+                                MenuMode=!MenuMode;
                                 break;
                             }default:{break;}
                         }
@@ -88,25 +102,23 @@ int main(){
             }
         }// END EVENTS
         // Check Window
-        if(!App.IsOpened()){
-            Save("SaveGame.zs");
-            break;
+        if(!App.IsOpened())break;
+        // Update Game View
+        X=Player::Character->X;
+        Y=Player::Character->Y;
+        {
+            float Ratio=WinHeight/WinWidth;
+            float S=(Player::SightRadius+1)*TileSize;
+            float W=S*(Ratio>1.f?1:1/Ratio);
+            float H=S*(Ratio<1.f?1:Ratio);
+            Cam.SetFromRect(sf::FloatRect(X*TileSize-W,Y*TileSize-H,(X+1)*TileSize+W,(Y+1)*TileSize+H));
         }
-        // Update View
-        X=Player::Character->X-CWidth;
-        Y=Player::Character->Y-CHeight;
-        Cam.SetFromRect(sf::FloatRect(X*TileSize,Y*TileSize,X*TileSize+SWidth,Y*TileSize+SHeight));
         // Draw Terrain
-        sf::IntRect Screen(X-1,Y-1,X+Width+1,Y+Height+1);
-        for(int x=Screen.Left;x<Screen.Right;x++){
-            for(int y=Screen.Top;y<Screen.Bottom;y++){
-                pairi C(x,y);
-                bool D=Draw;
-                if(!Draw){
-                    D=Player::Character->InSight(C);
-                }
-                unsigned int Index=GetTile(Maze,x,y);
-                if(D){
+        int SR=Player::SightRadius+1;
+        for(int x=X-SR;x<=X+SR;x++){
+            for(int y=Y-SR;y<=Y+SR;y++){
+                if(Player::Character->InSight(pairi(x,y))){
+                    unsigned int Index=GetTile(Maze,x,y);
                     Squares[Index].SetPosition(x*TileSize,y*TileSize);
                     App.Draw(Squares[Index]);
                 }
@@ -114,9 +126,10 @@ int main(){
         }
         // Update and Draw Entities
         Entity::Tick(App);
-        if(Menu)App.Draw(MenuGray);
+        if(MenuMode)App.Draw(MenuGray);
         // Interface
-        Cam.SetFromRect(sf::FloatRect(0,0,SWidth,SHeight));
+        Cam.SetFromRect(sf::FloatRect(0,0,WinWidth,WinHeight));
+        if(MenuMode)UIGroup::DrawAll(App);
         float W=ScoreTxt.GetRect().GetWidth();
         // Draw HighScore
         HighScore.SetPosition(W+Bullets.GetRect().GetWidth(),0);
@@ -132,64 +145,17 @@ int main(){
     return 0;
 }
 
-void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
-    int Step=1;
-    Tiles.clear();
-    set<pairi> Added={Tile},Old;
-    Tiles[Tile]=0;
-    pairi P[4]={pairi(-1,0),pairi(1,0),pairi(0,-1),pairi(0,1)};
-    while(Step<Size&&Added.size()){
-        Old=Added;
-        Added.clear();
-        for(const pairi& p:Old){
-            for(unsigned int i=0u;i<4u;i++){
-                pairi PP=P[i]+p;
-                if(!Blockers.count(GetTile(Maze,PP.first,PP.second))){
-                    if(Tiles.count(PP)){
-                        if(Tiles[PP]>Step){
-                            Tiles[PP]=Step;
-                            Added.insert(PP);
-                        }
-                    }else{
-                        Tiles[PP]=Step;
-                        Added.insert(PP);
-                    }
-                }
-            }
-        }
-        Step++;
+Button* ButtonStyle(Button* B,sf::Color Base){
+    sf::Color Tints[3]={Base/2,Base*2,Base};
+    sf::Shape* Rects[3]={&B->Pressed,&B->Hovering,&B->Normal};
+    for(unsigned int j=0u;j<3u;j++){
+        unsigned int i;
+        for(i=0u;i<4u;i++)Rects[j]->SetPointColor(i,Tints[j]);
+        Tints[j].a=128;
+        for(i=0u;i<4u;i++)Rects[j]->SetPointOutlineColor(i,Tints[j]);
+        Tints[j].a=255;
+        Rects[j]->SetOutlineWidth(1.f);
     }
-}
-
-char MakeTile(maze& Tiles,int x,int y){
-    char& Ret=(Tiles[pairi(x,y)]=0);
-    bool X=(x%2==0);
-    bool Y=(y%2==0);
-    int R=rand()%10;
-    if(R==0)Ret=2;
-    else if(R<=1+GameTime/50)Ret=99;
-    if(X&&Y){
-        Ret=1;
-        int rnd=rand()%2;
-        if(((y%4)+x)%4==0){
-            pairi Loc(x-1,y);
-            if(rnd){
-                Loc.first+=2;
-            }
-            char& NT=Tiles[Loc];
-            if(NT!=4)NT=1;
-        }else{
-            pairi Loc(x,y-1);
-            if(rnd){
-                Loc.second+=2;
-            }
-            char& NT=Tiles[Loc];
-            if(NT!=4)NT=1;
-        }
-    }
-    if(Ret==99){
-        Ret=0;
-        new Enemy(x,y,1+GameTime/50);
-    }
-    return Ret;
+    B->Text.SetColor(sf::Color(128,128,128));
+    return B;
 }

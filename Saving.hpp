@@ -2,7 +2,6 @@
 #define SAVING_HPP_INCLUDED
 
 maze LoadMaze(string FileName);
-void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers);
 void Save(string FileName);
 void Load(string FileName);
 

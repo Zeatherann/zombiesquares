@@ -70,14 +70,3 @@ void Load(string FileName){
         }
     }
 }
-
-namespace Data{
-
-ifstream& LoadChunk(Chunk& Block,ifstream& File){
-    char* Buffer=new char[Block.second];
-    File.read(Buffer,Block.second);
-    delete Buffer;
-    return File;
-}
-
-} // namespace Data
