@@ -8,8 +8,9 @@ public:
     // Variables
     short Power;
     char Tick;
+    char mTick;
     // Constructor
-    Enemy(int x=0,int y=0,short p=1);
+    Enemy(int x=0,int y=0,short p=1,short hp=5,char tick=20);
     // Functions
     void Update();
     void Save(ofstream& File)const;

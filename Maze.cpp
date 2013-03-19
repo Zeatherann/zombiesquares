@@ -57,7 +57,25 @@ char MakeTile(maze& Tiles,int x,int y){
     }
     if(Ret==99){
         Ret=0;
-        new Enemy(x,y,1+GameTime/50);
+        short Power=1+GameTime/50;
+        char Speed=20;
+        short Life=5;
+        int Rnd=rand()%10;
+        sf::Color Tint=sf::Color::Red;
+        if(Rnd==0){
+            Speed=10;
+            Power/=2;
+            if(Power<=0)Power=1;
+            Tint.b=255;
+        }else if(Rnd==1){
+            Speed=40;
+            Power*=2;
+            Tint.g=255;
+            Tint.r=128;
+            Tint.b=255;
+            Life=25;
+        }
+        (new Enemy(x,y,Power,Life,Speed))->Color=Tint;
     }
     return Ret;
 }

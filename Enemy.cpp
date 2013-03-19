@@ -1,13 +1,12 @@
 #include "main.hpp"
 
-Enemy::Enemy(int x,int y,short p):Entity('E',x,y,sf::Color::Red,5),Power(p),Tick(20){}
+Enemy::Enemy(int x,int y,short p,short hp,char tick):Entity('E',x,y,sf::Color::Red,hp),Power(p),Tick(20),mTick(tick){}
 
 Enemy::~Enemy(){}
 
 void Enemy::Update(){
-    Tick--;
-    if(Tick==0){
-        Tick=20;
+    if(--Tick<=0){
+        Tick=mTick;
         if(Player::Pathing.count(pairi(X,Y))){
             char C=Player::Pathing[pairi(X,Y)];
             vector<pairi> NewCoords;
