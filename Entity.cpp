@@ -32,7 +32,7 @@ void Entity::Tick(sf::RenderWindow& Window){
         for(Entity* Iter:ToDraw){
             if(Iter->Type!='P'){
                 pairi Loc(Iter->X,Iter->Y);
-                if(abs(Iter->X-X)<(Player::SightRadius+1)&&abs(Iter->Y-Y)<(Player::SightRadius+1)&&Player::Character->InSight(Loc)){
+                if(abs(Iter->X-X)<=(Player::SightRadius+1)&&abs(Iter->Y-Y)<=(Player::SightRadius+1)&&Player::Character->InSight(Loc)){
                     char Sight=Player::Character->GetSight(Loc);
                     float Alpha=255.f*(1.f-(float(Sight)/float(Player::SightRadius+1)));
                     if(Alpha>255.f)Alpha=255.f;

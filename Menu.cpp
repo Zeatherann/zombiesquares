@@ -26,7 +26,6 @@ void Menu::AddButton(Button* Child,char Style,int ExtraSteps){
     // Styles: 0 = Left, 1 = Middle, 2 = Right
     float Extra=Child->Normal.GetOutlineWidth();
     float Change=1.f+ExtraSteps;
-//    float* NP[5u]={&NextPos.x,&NextPos.y,&NextPos.z,*NP,NULL};
     float* NewPos=NULL;
     if(Style==1){
         Child->Location=Location+sf::Vector2f(Extra+Size.x*0.5f-(Child->Size.x*0.5f),Size.y+NextPos.y+Extra+Buffer);
@@ -43,10 +42,6 @@ void Menu::AddButton(Button* Child,char Style,int ExtraSteps){
     Child->Move(Child->Location);
     Change*=Child->Size.y+Extra*2.f+Buffer;
     (*NewPos)+=Change;
-//    *(NP[4u])+=Change;
-//    for(unsigned int i=1u;i<3u;i++)NP[3u]=*NP[i]>*NP[3u]?NP[i]:NP[3u];
-//    Background.SetPointPosition(2,Location.x+Size.x,Location.y+*NP[3u]+Size.y);
-//    Background.SetPointPosition(3,Location.x,Location.y+*NP[3u]+Size.y);
     UpdateGraphics();
     Elements.insert(Child);
 }
