@@ -6,6 +6,8 @@
 #include <sstream>
 #include <fstream>
 #include <SFML/Graphics.hpp>
+#include <yaml-cpp/yaml.h>
+#include "KeyMap.hpp"
 
 #define TileSize 32.f
 #define TileNum (4u) // Ground, Wall, Point Square, Starting Wall
@@ -37,6 +39,9 @@ typedef pair<int,int> pairi;
 typedef map<pair<int,int>,char> maze;
 class Enemy;
 class Player;
+class Menu;
+class Settings;
+class Button;
 /// Enumerations
 
 /// Structs
@@ -44,19 +49,33 @@ extern const sf::Color HighLight;
 extern maze Maze;
 extern int GameTime;
 extern pairi Adj[8];
-extern char MenuMode; // 0: Playing, 1: Paused, 2: Main Menu, 3: Game Over, -1: Quit to Main Menu, -2: Quit Game
+extern char MenuMode; // 0: Playing, 1: Paused, 2: Main Menu, 3: Game Over, 4: Settings, -1: Quit to Main Menu, -2: Quit Game
 extern float WinWidth;
 extern float WinHeight;
+extern float Awake;
+extern set<Menu*> Menus;
+extern Settings Config;
+extern KeyMap Keys;
+extern string BindKey;
+extern sf::Font Font;
 /// Global Functions
 int main();
 //-----
+void ShowMenu(Menu* M);
+void HideMenus();
+void AddKeyBinding(string KeyName,int Side,Menu* MenuToAdd,sf::Vector2f Size);
 // Templates
 template<typename T> std::string ToString(T number){
     std::stringstream S;
     S<<number;
     return S.str();
 }
-
+template<typename KeyType,typename ValueType>inline const KeyType* InMap(const map<KeyType*,ValueType>& Map,const KeyType& Element){
+    for(const pair<const KeyType*,ValueType>& Iter:Map){
+        if(*Iter.first==Element)return Iter.first;
+    }
+    return NULL;
+}
 template<typename T> T ToNumber(std::string str){
     std::stringstream S;
     S<<str;
@@ -74,6 +93,9 @@ template<typename Type1,typename Type2>inline pair<Type1,Type2> operator+(const 
 template<typename Type1,typename Type2>inline ostream& operator<<(ostream& L,const pair<Type1,Type2>& R){
     return L<<"("<<R.first<<", "<<R.second<<")";
 }
+template<typename Type>inline sf::Vector2<Type> operator*(const sf::Vector2<Type>& L,const sf::Vector2<Type>& R){
+    return sf::Vector2<Type>(L.x*R.x,L.y*R.y);
+}
 // Operators
 inline sf::Color operator/(const sf::Color& L,const unsigned char& R){
     return sf::Color(L.r/R,L.g/R,L.b/R);
@@ -85,6 +107,7 @@ inline sf::Color operator-(const sf::Color& L,const sf::Color& R){
     return sf::Color(L.r<R.r?0:L.r-R.r,L.g<R.g?0:L.g-R.g,L.b<R.b?0:L.b-R.b);
 }
 /// Project Files
+#include "Settings.hpp"
 #include "Maze.hpp"
 #include "Entity.hpp"
 #include "Lazer.hpp"

@@ -10,14 +10,19 @@ public:
     sf::Shape Normal;
     sf::Shape Hovering;
     sf::Shape Pressed;
+    sf::Key::Code Hotkey;
+    char HotKeyChar;
+    sf::String HotKeyString;
+    bool NotIgnore;
     // Constructor
-    Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick);
+    Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK=sf::Key::Count,char HKC='\0');
     // Destructor
     ~Button();
     // Functions
+    virtual void Update(const UIElement::State& CurState,sf::RenderWindow& Window);
+    void GetInput(const State& CurState);
     void Draw(sf::RenderWindow& Window);
     void SetText(string text);
-    void Move(sf::Vector2f NewLoc);
     void Resize(sf::Vector2f NewSize);
 };
 #endif // BUTTON_HPP

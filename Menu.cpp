@@ -39,7 +39,7 @@ void Menu::AddButton(Button* Child,char Style,int ExtraSteps){
         Child->Location=Location+sf::Vector2f(Edge+Extra,Size.y+NextPos.x+Extra+Buffer);
         NewPos=&NextPos.x;
     }
-    Child->Move(Child->Location);
+    Child->NeedUpdate=true;
     Change*=Child->Size.y+Extra*2.f+Buffer;
     (*NewPos)+=Change;
     UpdateGraphics();
@@ -52,19 +52,18 @@ float Menu::GetHeight()const{
     return *NP[3u];
 }
 
-void Menu::Draw(sf::RenderWindow& Window){
-    if(Visible){
-        Window.Draw(Background);
-        Window.Draw(Title);
-        UIGroup::Draw(Window);
-    }
-}
-
 void Menu::Move(sf::Vector2f NewLoc){
     sf::Vector2f Diff=Location-NewLoc;
     for(UIElement* Iter:Elements){
-        Iter->Move(Iter->Location-Diff);
+        Iter->Location-=Diff;
+        Iter->NeedUpdate=true;
     }
     Location=NewLoc;
     UpdateGraphics();
+}
+
+void Menu::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
+    Window.Draw(Background);
+    Window.Draw(Title);
+    UIGroup::Update(CurState,Window);
 }

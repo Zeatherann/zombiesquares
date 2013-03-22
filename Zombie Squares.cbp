@@ -18,6 +18,7 @@
 					<Add option="-lsfml-graphics-s-d" />
 					<Add option="-lsfml-window-s-d" />
 					<Add option="-lsfml-system-s-d" />
+					<Add option="-lYAML-s-d" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -33,6 +34,7 @@
 					<Add option="-lsfml-graphics-s" />
 					<Add option="-lsfml-window-s" />
 					<Add option="-lsfml-system-s" />
+					<Add option="-lYAML-s" />
 				</Linker>
 			</Target>
 		</Build>
@@ -46,6 +48,8 @@
 		<Unit filename="Enemy.hpp" />
 		<Unit filename="Entity.cpp" />
 		<Unit filename="Entity.hpp" />
+		<Unit filename="KeyMap.cpp" />
+		<Unit filename="KeyMap.hpp" />
 		<Unit filename="Lazer.cpp" />
 		<Unit filename="Lazer.hpp" />
 		<Unit filename="Maze.cpp" />
@@ -59,6 +63,9 @@
 		<Unit filename="README.txt" />
 		<Unit filename="Saving.cpp" />
 		<Unit filename="Saving.hpp" />
+		<Unit filename="Settings.cpp" />
+		<Unit filename="Settings.hpp" />
+		<Unit filename="State.hpp" />
 		<Unit filename="UIElement.cpp" />
 		<Unit filename="UIElement.hpp" />
 		<Unit filename="UIGroup.cpp" />

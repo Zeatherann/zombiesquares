@@ -2,21 +2,26 @@
 #define UIELEMENT_HPP
 class UIElement{
 public:
+    struct State{
+        sf::Vector2f Mouse;
+        int MouseDelta;
+        const sf::Input& Input;
+        State(const sf::Input& I);
+    };
+    static set<sf::Event::EventType> TrackedEvents;
     // Variables
     sf::Vector2f Location;
     sf::Vector2f Size;
-    bool Hover;
-    bool LClick;
-    bool RClick;
-    int MouseWheel;
+    bool Visible;
+    bool NeedUpdate;
     // Constructor
-    UIElement(sf::Vector2f L,sf::Vector2f S);
+    UIElement(sf::Vector2f Location,sf::Vector2f Size,bool Visible=true);
     // Destructor
     virtual ~UIElement();
     // Functions
-    virtual void GetInput(sf::Event MouseEvent,const sf::Input& State);
-    virtual void Draw(sf::RenderWindow& Window)=0;
-    virtual void Move(sf::Vector2f NewLoc);
-    virtual void Resize(sf::Vector2f NewSize);
+    inline bool IsHovering(sf::Vector2f Mouse)const{
+        return Mouse.x>Location.x&&Mouse.x<Location.x+Size.x&&Mouse.y>Location.y&&Mouse.y<Location.y+Size.y;
+    }
+    virtual void Update(const State& CurState,sf::RenderWindow& Window)=0;
 };
 #endif // UIELEMENT_HPP

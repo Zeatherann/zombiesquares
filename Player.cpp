@@ -4,12 +4,11 @@ Player* Player::Character;
 maze Player::Pathing;
 maze Player::Sight;
 int Player::AggroRadius=25;
-int Player::SightRadius=6;
+int Player::SightRadius=5;
 
-Player::Player(sf::String& T,sf::String& B,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),Bullets(B),High(H){
+Player::Player(sf::String& T,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),High(H){
     Character=this;
-    Bullets.SetText(" Bullets: "+ToString(Shots));
-    High.SetText("  High Score: "+ToString(HScore));
+    High.SetText("High: "+ToString(HScore));
     Text.SetText("Score: "+ToString(Score));
 }
 
@@ -29,7 +28,6 @@ void Player::Update(){
         Timer=50;
         if(Shots<3){
             Shots++;
-            Bullets.SetText(" Bullets: "+ToString(Shots));
         }
     }
 }
@@ -56,7 +54,6 @@ bool Player::MoveTo(pairi Loc){
 void Player::Shoot(pairi Direction){
     if(!Shots||Direction==pairi(0,0))return;
     Shots--;
-    Bullets.SetText(" Bullets: "+ToString(Shots));
     pairi C(X,Y);
     while(true){
         C=C+Direction;
@@ -78,7 +75,7 @@ void Player::Point(int Change){
     Text.SetText("Score: "+ToString(Score));
     if(Score>HScore){
         HScore=Score;
-        High.SetText(" High Score: "+ToString(HScore));
+        High.SetText("High: "+ToString(HScore));
     }
 }
 
@@ -122,8 +119,7 @@ void Player::Load(ifstream& File){
     oY=Y;
     EvalMaze(Pathing,pairi(X,Y),AggroRadius,{1,3});
     EvalMaze(Sight,pairi(X,Y),SightRadius,{1});
-    Bullets.SetText(" Bullets: "+ToString(Shots));
-    High.SetText("  High Score: "+ToString(HScore));
+    High.SetText("High: "+ToString(HScore));
     Text.SetText("Score: "+ToString(Score));
 }
 

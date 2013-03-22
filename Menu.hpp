@@ -16,8 +16,8 @@ public:
     // Destructor
     ~Menu();
     // Functions
+    void Update(const UIElement::State& CurState,sf::RenderWindow& Window);
     void AddButton(Button* Child,char Style=0,int ExtraSteps=0);
-    void Draw(sf::RenderWindow& Window);
     void Move(sf::Vector2f NewLoc);
     float GetHeight()const;
 };

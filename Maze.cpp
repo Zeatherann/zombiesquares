@@ -22,12 +22,13 @@ void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
             for(unsigned int i=0u;i<4u;i++){
                 pairi PP=P[i]+p;
                 if(!Blockers.count(GetTile(Maze,PP.first,PP.second))){
+                    bool Add=false;
                     if(Tiles.count(PP)){
-                        if(Tiles[PP]>Step){
-                            Tiles[PP]=Step;
-                            Added.insert(PP);
-                        }
+                        Add=Tiles[PP]>Step;
                     }else{
+                        Add=true;
+                    }
+                    if(Add){
                         Tiles[PP]=Step;
                         Added.insert(PP);
                     }

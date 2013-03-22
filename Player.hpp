@@ -18,10 +18,9 @@ public:
     int Timer;
     int Shots;
     sf::String& Text;
-    sf::String& Bullets;
     sf::String& High;
     // Constructor
-    Player(sf::String& T,sf::String& B,sf::String& H);
+    Player(sf::String& T,sf::String& H);
     // Functions
     void Update();
     bool MoveTo(pairi Loc);

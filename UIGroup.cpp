@@ -13,16 +13,8 @@ UIGroup::~UIGroup(){
     }
 }
 
-void UIGroup::GetInput(sf::Event Event,const sf::Input& State){
-    if(!Visible)return;
+void UIGroup::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
     for(UIElement* Iter:Elements){
-        Iter->GetInput(Event,State);
-    }
-}
-
-void UIGroup::Draw(sf::RenderWindow& Window){
-    if(!Visible)return;
-    for(UIElement* Iter:Elements){
-        Iter->Draw(Window);
+        if(Iter->Visible)Iter->Update(CurState,Window);
     }
 }
