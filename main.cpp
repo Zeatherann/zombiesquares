@@ -152,7 +152,9 @@ int main(){
         // Clear Old Scene;
         App.Clear();
         while(App.GetEvent(Events)){ // EVENTS
-            if(MenuMode!=0&&UIElement::TrackedEvents.count(Events.Type))UpdateUI=true;
+            if(MenuMode!=0&&UIElement::TrackedEvents.count(Events.Type)){
+                UpdateUI=true;
+            }
             if(BindKey!=""&&Events.Type==sf::Event::KeyPressed){
                 if(Config.Controls.count(BindKey)){
                     pair<sf::Key::Code,Button*>& KeyBinding=Config.Controls.find(BindKey)->second;
@@ -207,10 +209,6 @@ int main(){
                 }
             }
         }// END EVENTS
-        if(UpdateUI){
-            UpdateUI=false;
-            CurState.Mouse=App.ConvertCoords(Input.GetMouseX(),Input.GetMouseY());
-        }
         if(UpdateView){
             UpdateView=false;
             if(Player::Character){
@@ -258,6 +256,10 @@ int main(){
             ShowMenu(MenuGameOver);
         }
         Cam.SetFromRect(sf::FloatRect(0,0,WinWidth,WinHeight));
+        if(UpdateUI){
+            UpdateUI=false;
+            CurState.Mouse=App.ConvertCoords(Input.GetMouseX(),Input.GetMouseY());
+        }
         // Interface
         if(MenuMode!=0){
             App.Draw(MenuGray);
