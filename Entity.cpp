@@ -3,7 +3,7 @@
 set<Entity*> Entity::Entities;
 sf::Shape Entity::Tile=sf::Shape::Rectangle(1.f,1.f,TileSize-2,TileSize-2,sf::Color::White,1.f);
 
-Entity::Entity(char type,int x,int y,sf::Color color,short life):Type(type),X(x),Y(y),Color(color),Life(life){
+Entity::Entity(char type,int x,int y,sf::Color color,short life,bool lightsource):Type(type),X(x),Y(y),Color(color),Life(life),LightSource(lightsource){
     Entities.insert(this);
 }
 
@@ -42,7 +42,7 @@ void Entity::Tick(sf::RenderWindow& Window){
                 if(abs(Iter->X-X)<=(Player::SightRadius+1)&&abs(Iter->Y-Y)<=(Player::SightRadius+1)&&Player::Character->InSight(Loc)){
                     char Sight=Player::Character->GetSight(Loc);
                     float Alpha=255.f*(1.f-(float(Sight)/float(Player::SightRadius+1)));
-                    if(Alpha>255.f)Alpha=255.f;
+                    if(Iter->LightSource||Alpha>255.f)Alpha=255.f;
                     if(Alpha<0.f)Alpha=0.f;
                     Entity::Tile.SetColor(sf::Color(255,255,255,Alpha));
                     Iter->Draw(Window);
@@ -78,6 +78,7 @@ void Entity::Save(ofstream& File)const{
     File.write((char*)&Color.b,1u);
     File.write((char*)&Color.a,1u);
     File.write((char*)&Life,2u);
+    File.write((char*)&LightSource,1u);
 }
 
 void Entity::Load(ifstream& File){
@@ -89,4 +90,5 @@ void Entity::Load(ifstream& File){
     File.read((char*)&Color.b,1u);
     File.read((char*)&Color.a,1u);
     File.read((char*)&Life,2u);
+    File.read((char*)&LightSource,1u);
 }

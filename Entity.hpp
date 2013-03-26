@@ -3,7 +3,7 @@
 class Entity{
 protected:
     // Constructor
-    Entity(char type='\0',int x=0,int y=0,sf::Color color=sf::Color::White,short life=1);
+    Entity(char type='\0',int x=0,int y=0,sf::Color color=sf::Color::White,short life=1,bool lightsource=false);
     Entity(const Entity&);
     // Destructor
     virtual ~Entity();
@@ -18,6 +18,7 @@ public:
     int Y;
     sf::Color Color;
     short Life;
+    bool LightSource;
     // Functions
     static void Tick(sf::RenderWindow& Window);
     static void Clear();

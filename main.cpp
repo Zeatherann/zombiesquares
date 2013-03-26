@@ -132,6 +132,13 @@ int main(){
     }
     Menus={MenuPause,MenuMain,MenuNewGame,MenuSaveGame,MenuGameOver,MenuSettings};
     ShowMenu(MenuMain);
+    float Ratio;
+    float Sight;
+    float SightWidth;
+    float SightHeight;
+    sf::FloatRect GameView;
+    bool UpdateUI=true;
+    bool UpdateView=true;
     // Game Loop
     while(App.IsOpened()){
         // Update Time
@@ -144,7 +151,6 @@ int main(){
         }
         // Clear Old Scene;
         App.Clear();
-        bool UpdateUI=false;
         while(App.GetEvent(Events)){ // EVENTS
             if(MenuMode!=0&&UIElement::TrackedEvents.count(Events.Type))UpdateUI=true;
             if(BindKey!=""&&Events.Type==sf::Event::KeyPressed){
@@ -168,13 +174,12 @@ int main(){
                     }case sf::Event::Resized:{
                         WinWidth=Events.Size.Width;
                         WinHeight=Events.Size.Height;
-                        // Move Interfaces
-                        sf::Vector2f NewLoc((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f);
-                        for(Menu* Iter:Menus)Iter->Move(NewLoc);
+                        UpdateView=true;
                         break;
                     }case sf::Event::MouseWheelMoved:{
                         int Old=Player::SightRadius+Events.MouseWheel.Delta;
                         if(Old>=0)Player::SightRadius=Old;
+                        UpdateView=true;
                         break;
                     }case sf::Event::KeyPressed:{
                         sf::Key::Code Key=Events.Key.Code;
@@ -189,8 +194,11 @@ int main(){
                         }else if(MenuMode==0){
                             for(pair<const string,pair<sf::Key::Code,Button*>>& Iter:Config.Controls){
                                 if(Iter.second.first==Key){
-                                    if(Iter.first[0]=='S')Player::Character->Shoot(ShootKeys[Iter.first]);
-                                    else if(Iter.first[0]=='M')Player::Character->Move(MoveKeys[Iter.first]);
+                                    if(Iter.first[0]=='S'){
+                                        Player::Character->Shoot(ShootKeys[Iter.first]);
+                                    }else if(Iter.first[0]=='M'&&Player::Character->Move(MoveKeys[Iter.first])){
+                                        UpdateView=true;
+                                    }
                                 }
                             }
                         }
@@ -199,22 +207,31 @@ int main(){
                 }
             }
         }// END EVENTS
-        if(UpdateUI)CurState.Mouse=App.ConvertCoords(Input.GetMouseX(),Input.GetMouseY());
+        if(UpdateUI){
+            UpdateUI=false;
+            CurState.Mouse=App.ConvertCoords(Input.GetMouseX(),Input.GetMouseY());
+        }
+        if(UpdateView){
+            UpdateView=false;
+            if(Player::Character){
+                X=Player::Character->X;
+                Y=Player::Character->Y;
+            }
+            Ratio=WinHeight/WinWidth;
+            Sight=(Player::SightRadius+1)*TileSize;
+            SightWidth=Sight*(Ratio>1.f?1.f:1/Ratio);
+            SightHeight=Sight*(Ratio>1.f?Ratio:1.f);
+            UIScale=(Ratio>1.f?WinWidth/(Sight*2):WinHeight/(Sight*2));
+            // Move Interfaces
+            GameView=sf::FloatRect(X*TileSize-SightWidth,Y*TileSize-SightHeight,(X+1)*TileSize+SightWidth,(Y+1)*TileSize+SightHeight);
+            sf::Vector2f NewLoc((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f);
+            for(Menu* Iter:Menus)Iter->Move(NewLoc);
+        }
         // Check Window
         if(!App.IsOpened())break;
         // Update Game View
         if(Player::Character){
-            X=Player::Character->X;
-            Y=Player::Character->Y;
-        }
-        {
-            float Ratio=WinHeight/WinWidth;
-            float S=(Player::SightRadius+1)*TileSize;
-            bool B=Ratio>1.f;
-            float W=S*(B?1.f:1/Ratio);
-            float H=S*(B?Ratio:1.f);
-            UIScale=(B?WinWidth/(S*2):WinHeight/(S*2));
-            Cam.SetFromRect(sf::FloatRect(X*TileSize-W,Y*TileSize-H,(X+1)*TileSize+W,(Y+1)*TileSize+H));
+            Cam.SetFromRect(GameView);
             // Draw Terrain
             int SR=Player::SightRadius+1;
             for(int x=X-SR;x<=X+SR;x++){
@@ -223,8 +240,8 @@ int main(){
                     if(Player::Character->InSight(Loc)){
                         unsigned int Index=GetTile(Maze,x,y);
                         sf::Shape& Sq=Squares[Index];
-                        char Sight=Player::Character->GetSight(Loc);
-                        float Alpha=Awake*(1.f-(float(Sight)/float(Player::SightRadius+1)));
+                        char SightValue=Player::Character->GetSight(Loc);
+                        float Alpha=Awake*(1.f-(float(SightValue)/float(Player::SightRadius+1)));
                         if(Alpha>1.f)Alpha=1.f;
                         if(Alpha<0.f)Alpha=0.f;
                         Sq.SetColor(sf::Color(255,255,255,255.f*Alpha));
@@ -238,16 +255,14 @@ int main(){
         Entity::Tick(App);
         if(!Player::Character&&MenuMode==0){
             MenuMode=3;
-            MenuGameOver->Visible=true;
-            MenuPause->Visible=false;
-            MenuSaveGame->Visible=false;
-            MenuMain->Visible=false;
-            MenuNewGame->Visible=false;
+            ShowMenu(MenuGameOver);
         }
-        if(MenuMode!=0)App.Draw(MenuGray);
-        // Interface
         Cam.SetFromRect(sf::FloatRect(0,0,WinWidth,WinHeight));
-        if(MenuMode!=0)UIGroup::UpdateAll(CurState,App);
+        // Interface
+        if(MenuMode!=0){
+            App.Draw(MenuGray);
+            UIGroup::UpdateAll(CurState,App);
+        }
         // Draw Bullets
         if(Player::Character){
             int MaxBullets=3;
