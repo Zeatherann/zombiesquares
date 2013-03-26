@@ -115,9 +115,9 @@ inline sf::Color operator-(const sf::Color& L,const sf::Color& R){
 #include "Enemy.hpp"
 #include "Saving.hpp"
 #include "UIElement.hpp"
+#include "EventSubscriptions.hpp"
 #include "Button.hpp"
 Button* ButtonStyle(Button* B,sf::Color Base);
 #include "UIGroup.hpp"
 #include "Menu.hpp"
-#include "EventSubscriptions.hpp"
 #endif // MazePathing

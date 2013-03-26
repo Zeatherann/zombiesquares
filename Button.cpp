@@ -1,15 +1,14 @@
 #include "main.hpp"
 
-#define D(x) if(((string)Text.GetText()).find("Shoot Up") == 0)cout << x << endl;
 Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK,char HKC):UIElement(L,S),OnClick(onclick),OldClick(false),Text(text),Normal(sf::Shape::Rectangle(L,L+S,sf::Color(128,128,128))),Hovering(Normal),Pressed(Normal),Hotkey(HK),HotKeyChar(HKC),HotKeyString(text),NotIgnore(true),LeftPressed(false){
     UpdateGraphics();
-    OnPress = [&](sf::Event event) {
+    OnPress = [&](sf::Event event, const UIElement::State& CurState) {
         if (!Visible || (Owner && !Owner->Visible))
             return;
         if (event.MouseButton.Button == sf::Mouse::Left) {
             LeftPressed = true;
             if(NotIgnore){
-                if(IsHovering(sf::Vector2f(event.MouseButton.X, event.MouseButton.Y))){
+                if(IsHovering(CurState.Mouse)){
                     if(LeftPressed){
                         OldClick=true;
                         NotIgnore=false;
@@ -22,7 +21,7 @@ Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void(
             }
         }
     };
-    OnRelease = [&](sf::Event event) {
+    OnRelease = [&](sf::Event event, const UIElement::State&) {
         if (!Visible || (Owner && !Owner->Visible))
             return;
         if (event.MouseButton.Button == sf::Mouse::Left) {
@@ -85,7 +84,6 @@ void Button::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
         }else{
             ToDraw=&Hovering;
         }
-        //ToDraw = &Hovering;
     }
     if(NotIgnore&&Hotkey!=sf::Key::Count){
         if(CurState.Input.IsKeyDown(Hotkey)){
