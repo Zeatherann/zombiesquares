@@ -57,8 +57,11 @@ void Button::UpdateGraphics(){
     Hovering.SetPointPosition(2,Location.x+Size.x,Location.y+Size.y);
     Hovering.SetPointPosition(3,Location.x       ,Location.y+Size.y);
     Text.SetPosition(Location.x+Size.x*0.5f,Location.y+Size.y*0.5f);
-    sf::FloatRect TRec=Text.GetRect();
-    Text.SetCenter(TRec.GetWidth()*0.5f,TRec.GetHeight()*0.5f);
+    Text.SetSize(TileSize);
+    while(Text.GetRect().GetWidth()>Size.x){
+        Text.SetSize(Text.GetSize()-1.f);
+    }
+    Text.SetCenter(Text.GetRect().GetWidth()*0.5f,Text.GetRect().GetHeight()*0.5f);
     unsigned int Index;
     string Txt=Text.GetText();
     HotKeyString.SetText("");
