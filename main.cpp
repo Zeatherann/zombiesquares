@@ -28,6 +28,13 @@ int main(){
     vector<sf::Shape> UIShapes;
     const sf::Input& Input=App.GetInput();
     UIElement::State CurState(Input);
+    float Ratio;
+    float Sight;
+    float SightWidth;
+    float SightHeight;
+    sf::FloatRect GameView;
+    bool UpdateUI=true;
+    bool UpdateView=true;
     { /// Create UI Shapes
         sf::Shape S;
         S.SetOutlineWidth(1.f);
@@ -92,7 +99,7 @@ int main(){
         MenuNewGame->Buffer=TileSize*0.25f;
         Size.x-=2.f;
         Size.y-=2.f;
-        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Random Maze",Font),[&]{NewMaze();Awake=0.f;new Player(ScoreTxt,HighScore);MenuMode=0;HideMenus();},sf::Key::R,'R'),sf::Color(0,0,255,128)),1);
+        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Random Maze",Font),[&]{UpdateView=UpdateUI=true;NewMaze();Awake=0.f;new Player(ScoreTxt,HighScore);MenuMode=0;HideMenus();},sf::Key::R,'R'),sf::Color(0,0,255,128)),1);
         MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Load Maze",Font),NULL,sf::Key::L,'L'),sf::Color(255,0,0,128)),1);
         MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Cancel",Font),[&]{MenuMode=2;ShowMenu(MenuMain);},sf::Key::C,'C'),sf::Color(0,0,255,128)),1);
         Size.x+=2.f;
@@ -132,13 +139,6 @@ int main(){
     }
     Menus={MenuPause,MenuMain,MenuNewGame,MenuSaveGame,MenuGameOver,MenuSettings};
     ShowMenu(MenuMain);
-    float Ratio;
-    float Sight;
-    float SightWidth;
-    float SightHeight;
-    sf::FloatRect GameView;
-    bool UpdateUI=true;
-    bool UpdateView=true;
     // Game Loop
     while(App.IsOpened()){
         // Update Time

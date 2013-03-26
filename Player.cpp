@@ -62,7 +62,7 @@ void Player::Shoot(pairi Direction){
             if(T==1||T==3){
                 return;
             }else{
-                new Lazer(C,1);
+                new Lazer(C,3);
             }
         }else{
             return;
