@@ -19,6 +19,8 @@
 					<Add option="-lsfml-window-s-d" />
 					<Add option="-lsfml-system-s-d" />
 					<Add option="-lYAML-s-d" />
+					<Add option="-lboost_filesystem" />
+					<Add option="-lboost_system" />
 				</Linker>
 			</Target>
 			<Target title="Windows Release">
@@ -35,6 +37,8 @@
 					<Add option="-lsfml-window-s" />
 					<Add option="-lsfml-system-s" />
 					<Add option="-lYAML-s" />
+					<Add option="-lboost_filesystem" />
+					<Add option="-lboost_system" />
 				</Linker>
 			</Target>
 			<Target title="Linux Debug">
@@ -49,6 +53,8 @@
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-system" />
 					<Add option="-lyaml-cpp" />
+					<Add option="-lboost_filesystem" />
+					<Add option="-lboost_system" />
 				</Linker>
 			</Target>
 			<Target title="Linux Release">
@@ -64,6 +70,8 @@
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-system" />
 					<Add option="-lyaml-cpp" />
+					<Add option="-lboost_filesystem" />
+					<Add option="-lboost_system" />
 				</Linker>
 			</Target>
 		</Build>
@@ -76,6 +84,8 @@
 		</Compiler>
 		<Unit filename="Button.cpp" />
 		<Unit filename="Button.hpp" />
+		<Unit filename="Colors.cpp" />
+		<Unit filename="Colors.hpp" />
 		<Unit filename="Enemy.cpp" />
 		<Unit filename="Enemy.hpp" />
 		<Unit filename="Entity.cpp" />
