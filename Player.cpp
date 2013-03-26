@@ -59,7 +59,7 @@ void Player::Shoot(pairi Direction){
         C=C+Direction;
         if(Maze.count(C)){
             char T=GetTile(Maze,C.first,C.second);
-            if(T==1||T==4){
+            if(T==1||T==3){
                 return;
             }else{
                 new Lazer(C,1);
