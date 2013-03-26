@@ -43,7 +43,7 @@ void Menu::AddButton(Button* Child,char Style,int ExtraSteps){
     Change*=Child->Size.y+Extra*2.f+Buffer;
     (*NewPos)+=Change;
     UpdateGraphics();
-    Elements.insert(Child);
+    AddChild(Child);
 }
 
 float Menu::GetHeight()const{

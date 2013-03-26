@@ -152,6 +152,7 @@ int main(){
         // Clear Old Scene;
         App.Clear();
         while(App.GetEvent(Events)){ // EVENTS
+            EventSubscriptions::process(Events);
             if(MenuMode!=0&&UIElement::TrackedEvents.count(Events.Type)){
                 UpdateUI=true;
             }

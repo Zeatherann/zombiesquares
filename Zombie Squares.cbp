@@ -80,6 +80,8 @@
 		<Unit filename="Enemy.hpp" />
 		<Unit filename="Entity.cpp" />
 		<Unit filename="Entity.hpp" />
+		<Unit filename="EventSubscriptions.cpp" />
+		<Unit filename="EventSubscriptions.hpp" />
 		<Unit filename="KeyMap.cpp" />
 		<Unit filename="KeyMap.hpp" />
 		<Unit filename="Lazer.cpp" />

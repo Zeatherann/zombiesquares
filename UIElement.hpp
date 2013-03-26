@@ -1,5 +1,6 @@
 #ifndef UIELEMENT_HPP
 #define UIELEMENT_HPP
+class UIGroup;
 class UIElement{
 public:
     struct State{
@@ -13,9 +14,10 @@ public:
     sf::Vector2f Location;
     sf::Vector2f Size;
     bool Visible;
+    UIGroup* Owner;
     bool NeedUpdate;
     // Constructor
-    UIElement(sf::Vector2f Location,sf::Vector2f Size,bool Visible=true);
+    UIElement(sf::Vector2f Location,sf::Vector2f Size,bool Visible=true, UIGroup* Owner=NULL);
     // Destructor
     virtual ~UIElement();
     // Functions

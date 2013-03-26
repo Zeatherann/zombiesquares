@@ -119,4 +119,5 @@ inline sf::Color operator-(const sf::Color& L,const sf::Color& R){
 Button* ButtonStyle(Button* B,sf::Color Base);
 #include "UIGroup.hpp"
 #include "Menu.hpp"
+#include "EventSubscriptions.hpp"
 #endif // MazePathing
