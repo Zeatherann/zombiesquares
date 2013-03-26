@@ -6,7 +6,7 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
+			<Target title="Windows Debug">
 				<Option output="ZS Debug" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Debug/" />
 				<Option type="1" />
@@ -21,7 +21,7 @@
 					<Add option="-lYAML-s-d" />
 				</Linker>
 			</Target>
-			<Target title="Release">
+			<Target title="Windows Release">
 				<Option output="ZombieSquares" prefix_auto="1" extension_auto="1" />
 				<Option object_output="Release/" />
 				<Option type="0" />
@@ -37,8 +37,40 @@
 					<Add option="-lYAML-s" />
 				</Linker>
 			</Target>
+			<Target title="Linux Debug">
+				<Option output="Zombie Squares" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lyaml-cpp" />
+				</Linker>
+			</Target>
+			<Target title="Linux Release">
+				<Option output="Zombie Squares" prefix_auto="1" extension_auto="1" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lyaml-cpp" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-pedantic" />
+			<Add option="-std=c++0x" />
+			<Add option="-Wextra" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
