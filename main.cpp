@@ -71,7 +71,7 @@ int main(){
     Menu* MenuGameOver;
     Menu* MenuSettings;
     {
-        sf::Vector2f Size(WinWidth*0.75f,TileSize);
+        sf::Vector2f Size(TileSize*10,TileSize);
         sf::Vector2f Location(WinWidth*0.25f,WinHeight*0.25f);
         MenuPause=new Menu(Location,Size,0.f,sf::String("Paused",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)));
         MenuPause->Buffer=TileSize*0.25f;
@@ -223,7 +223,7 @@ int main(){
             // Move Interfaces
             GameView=sf::FloatRect(X*TileSize-SightWidth,Y*TileSize-SightHeight,(X+1)*TileSize+SightWidth,(Y+1)*TileSize+SightHeight);
             sf::Vector2f NewLoc((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f);
-            for(Menu* Iter:Menus)Iter->Move(NewLoc);
+            for(Menu* Iter:Menus)Iter->Move(sf::Vector2f(-Sight+TileSize,-Sight+TileSize*2.f));
         }
         // Check Window
         if(!App.IsOpened())break;
@@ -255,7 +255,7 @@ int main(){
             MenuMode=3;
             ShowMenu(MenuGameOver);
         }
-        Cam.SetFromRect(sf::FloatRect(0,0,WinWidth,WinHeight));
+        Cam.SetFromRect(sf::FloatRect(-SightWidth,-SightHeight,SightWidth,SightHeight));
         if(UpdateUI){
             UpdateUI=false;
             CurState.Mouse=App.ConvertCoords(Input.GetMouseX(),Input.GetMouseY());
@@ -270,23 +270,19 @@ int main(){
             int MaxBullets=3;
             int Shots=Player::Character->Shots;
             if(Shots>MaxBullets)MaxBullets=Shots;
-            float W=MaxBullets*TileSize*UIScale;
-            ScoreTxt.SetPosition(W,0);
+            float W=MaxBullets*TileSize-Sight;
+            ScoreTxt.SetPosition(W,-Sight);
             W+=ScoreTxt.GetRect().GetWidth();
-            HighScore.SetPosition(W+2,0);
-            App.Draw(sf::Shape::Rectangle(0,0,WinWidth,TileSize*UIScale,sf::Color::Black,1.f,sf::Color::White));
-            App.Draw(sf::Shape::Line({MaxBullets*UIScale*TileSize,0},{MaxBullets*UIScale*TileSize,UIScale*TileSize},1.f,sf::Color::White));
-            App.Draw(sf::Shape::Line({W,0},{W,UIScale*TileSize},1.f,sf::Color::White));
+            HighScore.SetPosition(W+2,-Sight);
+            App.Draw(sf::Shape::Rectangle(-Sight,-Sight,Sight,TileSize-Sight,sf::Color::Black));
+            App.Draw(sf::Shape::Rectangle(1-Sight,1-Sight,Sight-1,Sight-1,sf::Color(0,0,0,0),1.f,sf::Color::White));
             for(int a=0;a<Shots;a++){
-                UIShapes[0].SetScale(UIScale,UIScale);
-                UIShapes[0].SetPosition(a*TileSize*UIScale,0);
+                UIShapes[0].SetPosition(a*TileSize-Sight,-Sight);
                 App.Draw(UIShapes[0]);
             }
             // Draw HighScore
-            HighScore.SetScale(UIScale,UIScale);
             App.Draw(HighScore);
             // Draw Score
-            ScoreTxt.SetScale(UIScale,UIScale);
             App.Draw(ScoreTxt);
         }
         // Display Scene
