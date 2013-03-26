@@ -2,6 +2,20 @@
 
 Enemy::Enemy(int x,int y,short p,short hp,char tick):Entity('E',x,y,Colors["zombie"],hp),Power(p),Tick(20),mTick(tick){}
 
+Enemy* Enemy::NewSlowEnemy(int x, int y, short power) {
+    Enemy* e = new Enemy(x, y, power*2, 25, 40);
+    e->Color = Colors["slow zombie"];
+    return e;
+}
+
+Enemy* Enemy::NewFastEnemy(int x, int y, short power) {
+    power /= 2;
+    if (power <= 0) power = 1;
+    Enemy* e = new Enemy(x, y, power, 5, 10);
+    e->Color = Colors["fast zombie"];
+    return e;
+}
+
 Enemy::~Enemy(){}
 
 void Enemy::Update(){

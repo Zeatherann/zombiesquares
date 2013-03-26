@@ -5,8 +5,9 @@ void NewMaze(){
     int Area=3;
     Entity::Clear();
     GameTime=0;
-    for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?3:0;
+    for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?StartingWall:Floor;
     for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
+    //LoadStructures();
 }
 
 void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
@@ -68,22 +69,54 @@ char MakeTile(maze& Tiles,int x,int y){
     if(Ret==99){
         Ret=0;
         short Power=1+GameTime/50;
-        char Speed=20;
-        short Life=5;
         int Rnd=rand()%10;
-        sf::Color Tint=Colors["zombie"];
         if(Rnd==0){
-            Speed=10;
-            Power/=2;
-            if(Power<=0)Power=1;
-            Tint = Colors["fast zombie"];
+            Enemy::NewFastEnemy(x,y,Power);
         }else if(Rnd==1){
-            Speed=40;
-            Power*=2;
-            Tint = Colors["slow zombie"];
-            Life=25;
+            Enemy::NewSlowEnemy(x,y,Power);
+        }else{
+            new Enemy(x,y,Power,5,20);
         }
-        (new Enemy(x,y,Power,Life,Speed))->Color=Tint;
     }
     return Ret;
+}
+
+#include <boost/filesystem.hpp>
+// TODO: Store somewhere.
+// TODO: Randomly place.
+// TODO: Restrict size.
+// TODO? Print error messages instead of just skipping on ahead?
+void LoadStructures() {
+    using namespace boost::filesystem;
+    path p("Structures");
+    if (exists(p) && is_directory(p)) {
+        for (directory_iterator iter(p); iter != directory_iterator(); iter++) {
+          directory_entry e = *iter;
+          string file = e.path().relative_path().string();
+          sf::Image Img;
+          bool success = Img.LoadFromFile(file);
+          if (!success)
+            continue;
+          int centerX = Img.GetWidth() / 2;
+          int centerY = Img.GetHeight() / 2;
+          for (int i = 0; i < Img.GetWidth(); i++) {
+              for (int j = 0; j < Img.GetHeight(); j++) {
+                  sf::Color color = Img.GetPixel(i, j);
+                  if (color == Colors["floor"]) {
+                      Maze[pairi(i-centerX,j-centerY)] = Floor;
+                  } else if (color == Colors["wall"]) {
+                      Maze[pairi(i-centerX,j-centerY)] = Wall;
+                  } else if (color == Colors["point"]) {
+                      Maze[pairi(i-centerX,j-centerY)] = Point;
+                  } else if (color == Colors["zombie"]) {
+                      new Enemy(i-centerX, j-centerY);
+                  } else if (color == Colors["fast zombie"]) {
+                      Enemy::NewFastEnemy(i-centerX, j-centerY, 1);
+                  } else if (color == Colors["slow zombie"]) {
+                       Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
+                  }
+              }
+           }
+        }
+    }
 }

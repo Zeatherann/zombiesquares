@@ -6,4 +6,5 @@ char MakeTile(maze& Tiles,int x,int y);
 inline char GetTile(maze& Tiles,int x,int y){
     return Tiles.count(pairi(x,y))?Tiles[pairi(x,y)]:MakeTile(Tiles,x,y);
 }
+void LoadStructures();
 #endif // MAZE_HPP

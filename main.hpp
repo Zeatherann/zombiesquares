@@ -10,7 +10,8 @@
 #include "KeyMap.hpp"
 
 #define TileSize 32.f
-#define TileNum (4u) // Ground, Wall, Point Square, Starting Wall
+#define TileNum (4u) // Floor, Wall, Point Square, Starting Wall
+enum Tiles { Floor, Wall, Point, StartingWall };
 /// Namespaces
 using namespace std;
 namespace Data{
