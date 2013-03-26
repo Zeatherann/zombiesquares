@@ -71,18 +71,16 @@ char MakeTile(maze& Tiles,int x,int y){
         char Speed=20;
         short Life=5;
         int Rnd=rand()%10;
-        sf::Color Tint=sf::Color::Red;
+        sf::Color Tint=Colors["zombie"];
         if(Rnd==0){
             Speed=10;
             Power/=2;
             if(Power<=0)Power=1;
-            Tint.b=255;
+            Tint = Colors["fast zombie"];
         }else if(Rnd==1){
             Speed=40;
             Power*=2;
-            Tint.g=255;
-            Tint.r=128;
-            Tint.b=255;
+            Tint = Colors["slow zombie"];
             Life=25;
         }
         (new Enemy(x,y,Power,Life,Speed))->Color=Tint;

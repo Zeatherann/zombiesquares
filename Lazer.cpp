@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-Lazer::Lazer(pairi Loc,short P):Entity('L',Loc.first,Loc.second,sf::Color::Cyan,1,true),Hit(),Power(P){}
+Lazer::Lazer(pairi Loc,short P):Entity('L',Loc.first,Loc.second,Colors["lazer"],1,true),Hit(),Power(P){}
 
 Lazer::~Lazer(){}
 

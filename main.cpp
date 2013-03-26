@@ -24,7 +24,8 @@ int main(){
     sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Zombie Squares",Config.Fullscreen?sf::Style::Fullscreen:sf::Style::Titlebar|sf::Style::Resize|sf::Style::Close);
     sf::View Cam(sf::FloatRect(0.f,0.f,WinWidth,WinHeight));
     sf::Event Events;
-    sf::Color Tiles[TileNum]={sf::Color::Black,sf::Color(0,0,128),sf::Color(0,128,0),sf::Color(64,64,128)};
+    ColorsInit();
+    sf::Color Tiles[TileNum]={Colors["floor"],Colors["wall"],Colors["points"],Colors["starting wall"]};
     vector<sf::Shape> UIShapes;
     const sf::Input& Input=App.GetInput();
     UIElement::State CurState(Input);
@@ -37,11 +38,12 @@ int main(){
     bool UpdateView=true;
     { /// Create UI Shapes
         sf::Shape S;
+        sf::Color C = Colors["lazer"]+HighLight;
         S.SetOutlineWidth(1.f);
-        S.AddPoint({TileSize*0.125f,TileSize*0.125f},sf::Color::Cyan,sf::Color::Cyan+HighLight);
-        S.AddPoint({TileSize*0.875f,TileSize*0.125f},sf::Color::Cyan,sf::Color::Cyan+HighLight);
-        S.AddPoint({TileSize*0.875f,TileSize*0.875f},sf::Color::Cyan,sf::Color::Cyan+HighLight);
-        S.AddPoint({TileSize*0.125f,TileSize*0.875f},sf::Color::Cyan,sf::Color::Cyan+HighLight);
+        S.AddPoint({TileSize*0.125f,TileSize*0.125f},Colors["lazer"],C);
+        S.AddPoint({TileSize*0.875f,TileSize*0.125f},Colors["lazer"],C);
+        S.AddPoint({TileSize*0.875f,TileSize*0.875f},Colors["lazer"],C);
+        S.AddPoint({TileSize*0.125f,TileSize*0.875f},Colors["lazer"],C);
         UIShapes.push_back(S);
         S=sf::Shape();
     }

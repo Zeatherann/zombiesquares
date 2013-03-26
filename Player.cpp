@@ -6,7 +6,7 @@ maze Player::Sight;
 int Player::AggroRadius=25;
 int Player::SightRadius=5;
 
-Player::Player(sf::String& T,sf::String& H):Entity('P',0,0,sf::Color(255,128,0),10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),High(H){
+Player::Player(sf::String& T,sf::String& H):Entity('P',0,0,Colors["player"],10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),High(H){
     Character=this;
     High.SetText("High: "+ToString(HScore));
     Text.SetText("Score: "+ToString(Score));

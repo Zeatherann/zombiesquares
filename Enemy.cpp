@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-Enemy::Enemy(int x,int y,short p,short hp,char tick):Entity('E',x,y,sf::Color::Red,hp),Power(p),Tick(20),mTick(tick){}
+Enemy::Enemy(int x,int y,short p,short hp,char tick):Entity('E',x,y,Colors["zombie"],hp),Power(p),Tick(20),mTick(tick){}
 
 Enemy::~Enemy(){}
 

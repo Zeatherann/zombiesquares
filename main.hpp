@@ -107,6 +107,7 @@ inline sf::Color operator-(const sf::Color& L,const sf::Color& R){
     return sf::Color(L.r<R.r?0:L.r-R.r,L.g<R.g?0:L.g-R.g,L.b<R.b?0:L.b-R.b);
 }
 /// Project Files
+#include "Colors.hpp"
 #include "Settings.hpp"
 #include "Maze.hpp"
 #include "Entity.hpp"
