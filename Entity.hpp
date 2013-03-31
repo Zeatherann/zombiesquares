@@ -28,5 +28,6 @@ public:
     virtual void Save(ofstream& File)const;
     virtual void Load(ifstream& File);
     virtual bool Remove()const=0;
+    static void Delete(Entity*& Ent);
 };
 #endif // ENTITY_HPP

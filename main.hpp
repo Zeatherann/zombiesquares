@@ -8,12 +8,14 @@
 #include <SFML/Graphics.hpp>
 #include <yaml-cpp/yaml.h>
 #include "KeyMap.hpp"
+#include <boost/filesystem.hpp>
 
 #define TileSize 32.f
 #define TileNum (4u) // Floor, Wall, Point Square, Starting Wall
 enum Tiles { Floor, Wall, Point, StartingWall };
 /// Namespaces
 using namespace std;
+using namespace boost::filesystem;
 namespace Data{
 
 typedef pair<char*,unsigned int> Chunk;
@@ -65,7 +67,11 @@ int main();
 void ShowMenu(Menu* M);
 void HideMenus();
 void AddKeyBinding(string KeyName,int Side,Menu* MenuToAdd,sf::Vector2f Size);
+vector<pair<string,string>> GetFiles(const path& Path,bool Recurse=true,const set<string>& FileMasks=set<string>());
 // Templates
+template<typename Type>inline void operator+=(vector<Type>& L,const vector<Type>& R){
+    L.insert(L.end(),R.begin(),R.end());
+}
 template<typename T> std::string ToString(T number){
     std::stringstream S;
     S<<number;

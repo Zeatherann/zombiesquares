@@ -92,3 +92,8 @@ void Entity::Load(ifstream& File){
     File.read((char*)&Life,2u);
     File.read((char*)&LightSource,1u);
 }
+
+void Entity::Delete(Entity*& Ent){
+    delete Ent;
+    Ent=NULL;
+}

@@ -328,3 +328,22 @@ void AddKeyBinding(string KeyName,int Side,Menu* MenuToAdd,sf::Vector2f Size){
     //Button* B=ButtonStyle(Config.Controls[KeyName].second=new Button(sf::Vector2f(0,0),Size,sf::String(KeyName+": "+Keys.Find(Key),Font),[KeyName]{BindKey=KeyName;}),sf::Color(0,0,255,128));
     MenuToAdd->AddButton(ButtonStyle(Config.Controls[KeyName].second=new Button(sf::Vector2f(0,0),Size,sf::String(KeyName+": "+Keys.Find(Key),Font),[KeyName]{BindKey=KeyName;}),sf::Color(0,0,255,128)),Side);
 }
+
+vector<pair<string,string>> GetFiles(const path& Path,bool Recurse,const set<string>& FileMasks){
+    vector<pair<string,string>> Files;
+    if(exists(Path)&&is_directory(Path)){
+        for(directory_iterator Iter(Path);Iter!=directory_iterator();Iter++){
+            directory_entry Entry=*Iter;
+            const path& P=Entry.path();
+            if(is_directory(P)){
+                if(Recurse)Files+=GetFiles(P,true,FileMasks);
+            }else if(is_regular_file(P)){
+                string Extension=P.extension().string();
+                if(FileMasks.size()==0u||FileMasks.count(Extension)){
+                    Files.push_back(pair<string,string>(P.string(),Extension));
+                }
+            }
+        }
+    }
+    return Files;
+}

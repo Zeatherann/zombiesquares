@@ -7,6 +7,7 @@ void NewMaze(){
     GameTime=0;
     for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?StartingWall:Floor;
     for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
+    Maze.clear();
     //LoadStructures();
 }
 
@@ -81,13 +82,11 @@ char MakeTile(maze& Tiles,int x,int y){
     return Ret;
 }
 
-#include <boost/filesystem.hpp>
 // TODO: Store somewhere.
 // TODO: Randomly place.
 // TODO: Restrict size.
 // TODO? Print error messages instead of just skipping on ahead?
 void LoadStructures() {
-    using namespace boost::filesystem;
     path p("Structures");
     if (exists(p) && is_directory(p)) {
         for (directory_iterator iter(p); iter != directory_iterator(); iter++) {
@@ -97,17 +96,18 @@ void LoadStructures() {
           bool success = Img.LoadFromFile(file);
           if (!success)
             continue;
-          int centerX = Img.GetWidth() / 2;
-          int centerY = Img.GetHeight() / 2;
-          for (int i = 0; i < Img.GetWidth(); i++) {
-              for (int j = 0; j < Img.GetHeight(); j++) {
+          unsigned int centerX = Img.GetWidth() / 2u;
+          unsigned int centerY = Img.GetHeight() / 2u;
+          for (unsigned int i = 0u; i < Img.GetWidth(); i++) {
+              for (unsigned int j = 0u; j < Img.GetHeight(); j++) {
                   sf::Color color = Img.GetPixel(i, j);
+                  char Tile=GetTile(Maze,i-centerX,j-centerY);
                   if (color == Colors["floor"]) {
                       Maze[pairi(i-centerX,j-centerY)] = Floor;
                   } else if (color == Colors["wall"]) {
-                      Maze[pairi(i-centerX,j-centerY)] = Wall;
+                      Tile = Wall;
                   } else if (color == Colors["point"]) {
-                      Maze[pairi(i-centerX,j-centerY)] = Point;
+                      Tile = Point;
                   } else if (color == Colors["zombie"]) {
                       new Enemy(i-centerX, j-centerY);
                   } else if (color == Colors["fast zombie"]) {
@@ -115,8 +115,28 @@ void LoadStructures() {
                   } else if (color == Colors["slow zombie"]) {
                        Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
                   }
+                  Maze[pairi(i-centerX,j-centerY)]=Tile;
               }
            }
         }
     }
+}
+
+bool EraseMazeChunk(maze& Tiles,pairi TopLeft,pairi BottomRight){
+    function<bool(const Entity*,int,int,int,int)> InRect=[](const Entity* E,int Left,int Top,int Right,int Bottom)->bool{
+        if(E->X<Left||E->X>Right||E->Y<Top||E->Y>Bottom)return false;
+        return true;
+    };
+    if(TopLeft.first>=BottomRight.first||TopLeft.second>=BottomRight.second)return false;
+    if(Player::Character&&InRect(Player::Character,TopLeft.first,TopLeft.second,BottomRight.first,BottomRight.second))return false;
+    for(int x=TopLeft.first;x<=BottomRight.first;x++){
+        for(int y=TopLeft.second;y<=BottomRight.second;y++){
+            pairi pt(x,y);
+            if(Tiles.count(pt))Tiles.erase(pt);
+        }
+    }
+    for(Entity* Iter:Entity::Entities){
+        if(Iter->Type!='C'&&InRect(Iter,TopLeft.first,TopLeft.second,BottomRight.first,BottomRight.second))Entity::Delete(Iter);
+    }
+    return true;
 }
