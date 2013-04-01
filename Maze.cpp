@@ -93,14 +93,11 @@ void StructuresLoad() {
             directory_entry e = *iter;
             if (is_regular_file(e)) {
                 string file = e.path().relative_path().string();
-                cout << "Found structure " << file << endl;
                 sf::Image* Img = new sf::Image();
                 bool success = Img->LoadFromFile(file);
                 if (!success)
                     continue;
                 Structures.push_back(Img);
-            } else {
-                cout << "Found directory " << e.path().string() << endl;
             }
         }
     }
