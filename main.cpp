@@ -25,7 +25,7 @@ int main(){
     sf::View Cam(sf::FloatRect(0.f,0.f,WinWidth,WinHeight));
     sf::Event Events;
     ColorsInit();
-    LoadStructures();
+    StructuresLoad();
     sf::Color Tiles[TileNum]={Colors["floor"],Colors["wall"],Colors["point"],Colors["starting wall"]};
     vector<sf::Shape> UIShapes;
     const sf::Input& Input=App.GetInput();

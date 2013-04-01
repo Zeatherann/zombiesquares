@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-set<sf::Image*> Structures;
+vector<sf::Image*> Structures;
 
 void NewMaze(){
     Maze.clear();
@@ -86,22 +86,27 @@ char MakeTile(maze& Tiles,int x,int y){
 // TODO: Randomly place.
 // TODO: Restrict size.
 // TODO? Print error messages instead of just skipping on ahead?
-void LoadStructures() {
+void StructuresLoad() {
     path p("Structures");
     if (exists(p) && is_directory(p)) {
-        for (directory_iterator iter(p); iter != directory_iterator(); iter++) {
-          directory_entry e = *iter;
-          string file = e.path().relative_path().string();
-          sf::Image* Img = new sf::Image();
-          bool success = Img->LoadFromFile(file);
-          if (!success)
-            continue;
-          Structures.insert(Img);
+        for (recursive_directory_iterator iter(p); iter != recursive_directory_iterator(); iter++) {
+            directory_entry e = *iter;
+            if (is_regular_file(e)) {
+                string file = e.path().relative_path().string();
+                cout << "Found structure " << file << endl;
+                sf::Image* Img = new sf::Image();
+                bool success = Img->LoadFromFile(file);
+                if (!success)
+                    continue;
+                Structures.push_back(Img);
+            } else {
+                cout << "Found directory " << e.path().string() << endl;
+            }
         }
     }
 }
 
-void PlaceStructure(sf::Image* Img) {
+void StructurePlace(sf::Image* Img) {
     unsigned int centerX = Img->GetWidth() / 2u;
     unsigned int centerY = Img->GetHeight() / 2u;
     for (unsigned int i = 0u; i < Img->GetWidth(); i++) {

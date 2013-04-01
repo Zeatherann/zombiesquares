@@ -61,7 +61,7 @@ extern Settings Config;
 extern KeyMap Keys;
 extern string BindKey;
 extern sf::Font Font;
-extern set<sf::Image*> Structures;
+extern vector<sf::Image*> Structures;
 /// Global Functions
 int main();
 //-----
