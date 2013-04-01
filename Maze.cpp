@@ -11,6 +11,9 @@ void NewMaze(){
     for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
 }
 
+/**
+TODO: Make Michael comment this. What in the world is this function doing?
+*/
 void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
     int Step=1;
     Tiles.clear();
@@ -41,6 +44,9 @@ void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
     }
 }
 
+/**
+TODO: Make Michael comment this. Why is it returning a char? Why does it matter if x and y are divisible by two?
+*/
 char MakeTile(maze& Tiles,int x,int y){
     char& Ret=(Tiles[pairi(x,y)]=0);
     bool X=(x%2==0);
@@ -75,17 +81,22 @@ char MakeTile(maze& Tiles,int x,int y){
             Enemy::NewFastEnemy(x,y,Power);
         }else if(Rnd==1){
             Enemy::NewSlowEnemy(x,y,Power);
-        }else{
+        }else if (Rnd>=2 && Rnd<9){
             new Enemy(x,y,Power,5,20);
+        }else{
+            cout << "Placed a structure!";
+            StructurePlaceRandom(pairi(x,y));
         }
     }
     return Ret;
 }
 
-// TODO: Store somewhere.
 // TODO: Randomly place.
 // TODO: Restrict size.
 // TODO? Print error messages instead of just skipping on ahead?
+/**
+Loads structure images from the Structures folder.
+*/
 void StructuresLoad() {
     path p("Structures");
     if (exists(p) && is_directory(p)) {
@@ -103,9 +114,12 @@ void StructuresLoad() {
     }
 }
 
-void StructurePlace(sf::Image* Img) {
-    unsigned int centerX = Img->GetWidth() / 2u;
-    unsigned int centerY = Img->GetHeight() / 2u;
+/**
+Places the given structure into the world at the given offset.
+*/
+void StructurePlace(sf::Image* Img, pairi offset) {
+    unsigned int centerX = Img->GetWidth() / 2u + offset.first;
+    unsigned int centerY = Img->GetHeight() / 2u + offset.second;
     for (unsigned int i = 0u; i < Img->GetWidth(); i++) {
         for (unsigned int j = 0u; j < Img->GetHeight(); j++) {
           sf::Color color = Img->GetPixel(i, j);
@@ -126,6 +140,14 @@ void StructurePlace(sf::Image* Img) {
           Maze[pairi(i-centerX,j-centerY)]=Tile;
         }
     }
+}
+
+/**
+Randomly chooses a structure and places it at the given offset.
+*/
+void StructurePlaceRandom(pairi offset) {
+    sf::Image* structure = Structures[rand()%Structures.size()];
+    StructurePlace(structure, offset);
 }
 
 bool EraseMazeChunk(maze& Tiles,pairi TopLeft,pairi BottomRight){
