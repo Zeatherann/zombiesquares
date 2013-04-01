@@ -1,5 +1,7 @@
 #include "main.hpp"
 
+set<sf::Image*> Structures;
+
 void NewMaze(){
     Maze.clear();
     int Area=3;
@@ -7,7 +9,6 @@ void NewMaze(){
     GameTime=0;
     for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?StartingWall:Floor;
     for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
-    //LoadStructures();
 }
 
 void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
@@ -91,32 +92,36 @@ void LoadStructures() {
         for (directory_iterator iter(p); iter != directory_iterator(); iter++) {
           directory_entry e = *iter;
           string file = e.path().relative_path().string();
-          sf::Image Img;
-          bool success = Img.LoadFromFile(file);
+          sf::Image* Img = new sf::Image();
+          bool success = Img->LoadFromFile(file);
           if (!success)
             continue;
-          unsigned int centerX = Img.GetWidth() / 2u;
-          unsigned int centerY = Img.GetHeight() / 2u;
-          for (unsigned int i = 0u; i < Img.GetWidth(); i++) {
-              for (unsigned int j = 0u; j < Img.GetHeight(); j++) {
-                  sf::Color color = Img.GetPixel(i, j);
-                  char Tile=GetTile(Maze,i-centerX,j-centerY);
-                  if (color == Colors["floor"]) {
-                      Maze[pairi(i-centerX,j-centerY)] = Floor;
-                  } else if (color == Colors["wall"]) {
-                      Tile = Wall;
-                  } else if (color == Colors["point"]) {
-                      Tile = Point;
-                  } else if (color == Colors["zombie"]) {
-                      new Enemy(i-centerX, j-centerY);
-                  } else if (color == Colors["fast zombie"]) {
-                      Enemy::NewFastEnemy(i-centerX, j-centerY, 1);
-                  } else if (color == Colors["slow zombie"]) {
-                       Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
-                  }
-                  Maze[pairi(i-centerX,j-centerY)]=Tile;
-              }
-           }
+          Structures.insert(Img);
+        }
+    }
+}
+
+void PlaceStructure(sf::Image* Img) {
+    unsigned int centerX = Img->GetWidth() / 2u;
+    unsigned int centerY = Img->GetHeight() / 2u;
+    for (unsigned int i = 0u; i < Img->GetWidth(); i++) {
+        for (unsigned int j = 0u; j < Img->GetHeight(); j++) {
+          sf::Color color = Img->GetPixel(i, j);
+          char Tile=GetTile(Maze,i-centerX,j-centerY);
+          if (color == Colors["floor"]) {
+              Maze[pairi(i-centerX,j-centerY)] = Floor;
+          } else if (color == Colors["wall"]) {
+              Tile = Wall;
+          } else if (color == Colors["point"]) {
+              Tile = Point;
+          } else if (color == Colors["zombie"]) {
+              new Enemy(i-centerX, j-centerY);
+          } else if (color == Colors["fast zombie"]) {
+              Enemy::NewFastEnemy(i-centerX, j-centerY, 1);
+          } else if (color == Colors["slow zombie"]) {
+               Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
+          }
+          Maze[pairi(i-centerX,j-centerY)]=Tile;
         }
     }
 }

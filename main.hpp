@@ -61,13 +61,13 @@ extern Settings Config;
 extern KeyMap Keys;
 extern string BindKey;
 extern sf::Font Font;
+extern set<sf::Image*> Structures;
 /// Global Functions
 int main();
 //-----
 void ShowMenu(Menu* M);
 void HideMenus();
 void AddKeyBinding(string KeyName,int Side,Menu* MenuToAdd,sf::Vector2f Size);
-vector<pair<string,string>> GetFiles(const path& Path,bool Recurse=true,const set<string>& FileMasks=set<string>());
 // Templates
 template<typename Type>inline void operator+=(vector<Type>& L,const vector<Type>& R){
     L.insert(L.end(),R.begin(),R.end());
