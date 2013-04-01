@@ -7,7 +7,6 @@ void NewMaze(){
     GameTime=0;
     for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?StartingWall:Floor;
     for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
-    Maze.clear();
     //LoadStructures();
 }
 
