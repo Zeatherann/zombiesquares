@@ -7,7 +7,9 @@ Entity::Entity(char type,int x,int y,sf::Color color,short life,bool lightsource
     Entities.insert(this);
 }
 
-Entity::~Entity(){}
+Entity::~Entity(){
+    Entities.erase(this);
+}
 
 void Entity::Clear(){
     for(Entity* Iter:Entities){
@@ -17,11 +19,10 @@ void Entity::Clear(){
 }
 
 void Entity::Tick(sf::RenderWindow& Window){
-    set<Entity*> Remove;
     vector<Entity*> ToDraw,Lazers;
     for(Entity* Iter:Entities){
         if(Iter->Remove()){
-            Remove.insert(Iter);
+            delete Iter;
         }else{
             if(MenuMode==0)Iter->Update();
             if(Iter->Type=='L')Lazers.push_back(Iter);
@@ -29,10 +30,6 @@ void Entity::Tick(sf::RenderWindow& Window){
         }
     }
     ToDraw.insert(ToDraw.end(),Lazers.begin(),Lazers.end());
-    if(Remove.size())for(Entity* Iter:Remove){
-        Entities.erase(Iter);
-        delete Iter;
-    }
     if(Player::Character){
         int X=Player::Character->X;
         int Y=Player::Character->Y;
