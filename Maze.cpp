@@ -62,25 +62,25 @@ char MakeTile(maze& Tiles,int x,int y){
                 Loc.first+=2;
             }
             char& NT=Tiles[Loc];
-            if(NT!=4)NT=1;
+            if(NT!=StartingWall)NT=Wall;
         }else{
             pairi Loc(x,y-1);
             if(rnd){
                 Loc.second+=2;
             }
             char& NT=Tiles[Loc];
-            if(NT!=4)NT=1;
+            if(NT!=StartingWall)NT=Wall;
         }
     }
 
-    if(Ret==1){
+    if(Ret==Floor){
         int R=rand()%1000;
         if(R<100){
             Ret=2;
         }else if(R<=101) {
             cout << "Made a structure @ (" << x << ", " << y << ")" << endl;
             StructurePlaceRandom(pairi(x,y));
-            Ret = Maze[pairi(x,y)];
+            Ret = Tiles[pairi(x,y)];
         }else if(R<=102+GameTime/50){
             Ret=0;
             short Power=1+GameTime/50;
@@ -134,12 +134,20 @@ Places the given structure into the world at the given offset.
 */
 void StructurePlace(sf::Image* structure, pairi offset) {
     StructureEraseBeforePlace(structure, offset);
-    unsigned int centerX = structure->GetWidth() / 2u + offset.first;
-    unsigned int centerY = structure->GetHeight() / 2u + offset.second;
+    unsigned int halfWidth = structure->GetWidth() / 2u;
+    unsigned int halfHeight = structure->GetHeight() / 2u;
+    unsigned int centerX = offset.first;
+    unsigned int centerY = offset.second;
+    pairi loopTopLeft(0,0);
     for (unsigned int i = 0u; i < structure->GetWidth(); i++) {
         for (unsigned int j = 0u; j < structure->GetHeight(); j++) {
           sf::Color color = structure->GetPixel(i, j);
-          char Tile=GetTile(Maze,i-centerX,j-centerY);
+          int x = centerX-halfWidth+i;
+          int y = centerY-halfHeight+j;
+          char Tile=GetTile(Maze,x,y);
+          if (i == 0 && j == 0) {
+              loopTopLeft = pairi(x, y);
+          }
           if (color == Colors["floor"]) {
               Tile = Floor;
           } else if (color == Colors["wall"]) {
@@ -147,13 +155,28 @@ void StructurePlace(sf::Image* structure, pairi offset) {
           } else if (color == Colors["point"]) {
               Tile = Point;
           } else if (color == Colors["zombie"]) {
-              new Enemy(i-centerX, j-centerY);
+              Tile = Floor;
+              new Enemy(x, y);
           } else if (color == Colors["fast zombie"]) {
-              Enemy::NewFastEnemy(i-centerX, j-centerY, 1);
+              Tile = Floor;
+              Enemy::NewFastEnemy(x, y, 1);
           } else if (color == Colors["slow zombie"]) {
-              Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
+              Tile = Floor;
+              Enemy::NewSlowEnemy(x, y, 1);
           }
-          Maze[pairi(i-centerX,j-centerY)]=Tile;
+          Maze[pairi(x, y)]=Tile;
+        }
+    }
+    pairi topLeft = offset - pairi(structure->GetWidth()/2, structure->GetHeight()/2);
+    pairi bottomRight = topLeft + pairi(structure->GetWidth(), structure->GetHeight());
+    if (topLeft != loopTopLeft)
+        cout << "Loop top left: " << loopTopLeft << " real top left: " << topLeft << endl;
+    for (int i = topLeft.first; i < bottomRight.first; i++) {
+        for (int j = topLeft.second; j < bottomRight.second; j++) {
+            if (Maze.count(pairi(i,j)) == 0) {
+                cout << "ERROR! tl:" << topLeft << " br:" << bottomRight << " diff:" << (bottomRight-topLeft) << " at:" << pairi(i,j) << endl;
+                return;
+            }
         }
     }
 }
