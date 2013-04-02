@@ -97,6 +97,9 @@ template<typename Type>inline set<Type>& operator+=(set<Type>& L,const set<Type>
 template<typename Type1,typename Type2>inline pair<Type1,Type2> operator+(const pair<Type1,Type2>& L,const pair<Type1,Type2>& R){
     return pair<Type1,Type2>(L.first+R.first,L.second+R.second);
 }
+template<typename Type1,typename Type2>inline pair<Type1,Type2> operator-(const pair<Type1,Type2>& L,const pair<Type1,Type2>& R){
+    return pair<Type1,Type2>(L.first-R.first,L.second-R.second);
+}
 template<typename Type1,typename Type2>inline ostream& operator<<(ostream& L,const pair<Type1,Type2>& R){
     return L<<"("<<R.first<<", "<<R.second<<")";
 }
