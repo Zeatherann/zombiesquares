@@ -7,8 +7,8 @@ void NewMaze(){
     int Area=3;
     Entity::Clear();
     GameTime=0;
-    for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?StartingWall:Floor;
     for(int a=-Area*10;a<=Area*10;a++)for(int b=-Area*10;b<=Area*10;b++)GetTile(Maze,a,b);
+    for(int a=-Area;a<=Area;a++)for(int b=-Area;b<=Area;b++)Maze[pairi(a,b)]=abs(a)==Area||abs(b)==Area?StartingWall:Floor;
 }
 
 /**
@@ -45,7 +45,6 @@ void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
 }
 
 /**
-TODO: Make Michael comment this. Why is it returning a char? Why does it matter if x and y are divisible by two?
 Generates the random labyrinth, don't question the magic.
 Divisible by two is the core of the maze generating algorithm. The nested test for modulo 4 sorts out the vertical and horizontal 'walls'.
     This creates the proper corridors in the maze.
@@ -73,23 +72,25 @@ char MakeTile(maze& Tiles,int x,int y){
             if(NT!=4)NT=1;
         }
     }
+
     if(Ret==1){
-        int R=rand()%10;
-        if(R==0){
+        int R=rand()%1000;
+        if(R<100){
             Ret=2;
-        }else if(R<=1+GameTime/50){
+        }else if(R<=101) {
+            cout << "Made a structure @ (" << x << ", " << y << ")" << endl;
+            StructurePlaceRandom(pairi(x,y));
+            Ret = Maze[pairi(x,y)];
+        }else if(R<=102+GameTime/50){
             Ret=0;
             short Power=1+GameTime/50;
             int Rnd=rand()%10;
             if(Rnd==0){
-                Enemy::NewFastEnemy(x,y,Power);
+                //Enemy::NewFastEnemy(x,y,Power);
             }else if(Rnd==1){
-                Enemy::NewSlowEnemy(x,y,Power);
-            }else if (Rnd>=2 && Rnd<9){
-                new Enemy(x,y,Power,5,20);
+                //Enemy::NewSlowEnemy(x,y,Power);
             }else{
-                cout << "Placed a structure!";
-                StructurePlaceRandom(pairi(x,y));
+                //new Enemy(x,y,Power,5,20);
             }
         }
     }
@@ -120,17 +121,27 @@ void StructuresLoad() {
 }
 
 /**
+Clears the area the structure occupies.
+*/
+void StructureEraseBeforePlace(sf::Image* structure, pairi offset) {
+    pairi topLeft = offset - pairi(structure->GetWidth(), structure->GetHeight());
+    pairi bottomRight = topLeft + pairi(structure->GetWidth(), structure->GetHeight());
+    EraseMazeChunk(Maze, topLeft, bottomRight);
+}
+
+/**
 Places the given structure into the world at the given offset.
 */
-void StructurePlace(sf::Image* Img, pairi offset) {
-    unsigned int centerX = Img->GetWidth() / 2u + offset.first;
-    unsigned int centerY = Img->GetHeight() / 2u + offset.second;
-    for (unsigned int i = 0u; i < Img->GetWidth(); i++) {
-        for (unsigned int j = 0u; j < Img->GetHeight(); j++) {
-          sf::Color color = Img->GetPixel(i, j);
+void StructurePlace(sf::Image* structure, pairi offset) {
+    StructureEraseBeforePlace(structure, offset);
+    unsigned int centerX = structure->GetWidth() / 2u + offset.first;
+    unsigned int centerY = structure->GetHeight() / 2u + offset.second;
+    for (unsigned int i = 0u; i < structure->GetWidth(); i++) {
+        for (unsigned int j = 0u; j < structure->GetHeight(); j++) {
+          sf::Color color = structure->GetPixel(i, j);
           char Tile=GetTile(Maze,i-centerX,j-centerY);
           if (color == Colors["floor"]) {
-              Maze[pairi(i-centerX,j-centerY)] = Floor;
+              Tile = Floor;
           } else if (color == Colors["wall"]) {
               Tile = Wall;
           } else if (color == Colors["point"]) {
@@ -140,7 +151,7 @@ void StructurePlace(sf::Image* Img, pairi offset) {
           } else if (color == Colors["fast zombie"]) {
               Enemy::NewFastEnemy(i-centerX, j-centerY, 1);
           } else if (color == Colors["slow zombie"]) {
-               Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
+              Enemy::NewSlowEnemy(i-centerX, j-centerY, 1);
           }
           Maze[pairi(i-centerX,j-centerY)]=Tile;
         }
@@ -155,17 +166,18 @@ void StructurePlaceRandom(pairi offset) {
     StructurePlace(structure, offset);
 }
 
-bool EraseMazeChunk(maze& Tiles,pairi TopLeft,pairi BottomRight){
-    function<bool(const Entity*,int,int,int,int)> InRect=[](const Entity* E,int Left,int Top,int Right,int Bottom)->bool{
-        if(E->X<Left||E->X>Right||E->Y<Top||E->Y>Bottom)return false;
+bool InRect(const Entity* E, int Left, int Top, int Right, int Bottom) {
+    if(E->X<Left||E->X>Right||E->Y<Top||E->Y>Bottom)return false;
         return true;
-    };
+}
+
+bool EraseMazeChunk(maze& Tiles,pairi TopLeft,pairi BottomRight){
     if(TopLeft.first>=BottomRight.first||TopLeft.second>=BottomRight.second)return false;
     if(Player::Character&&InRect(Player::Character,TopLeft.first,TopLeft.second,BottomRight.first,BottomRight.second))return false;
     for(int x=TopLeft.first;x<=BottomRight.first;x++){
         for(int y=TopLeft.second;y<=BottomRight.second;y++){
             pairi pt(x,y);
-            if(Tiles.count(pt))Tiles.erase(pt);
+            Tiles.erase(pt);
         }
     }
     for(Entity* Iter:Entity::Entities){
