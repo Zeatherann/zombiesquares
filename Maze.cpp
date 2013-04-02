@@ -47,6 +47,8 @@ void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
 /**
 TODO: Make Michael comment this. Why is it returning a char? Why does it matter if x and y are divisible by two?
 Generates the random labyrinth, don't question the magic.
+Divisible by two is the core of the maze generating algorithm. The nested test for modulo 4 sorts out the vertical and horizontal 'walls'.
+    This creates the proper corridors in the maze.
 */
 char MakeTile(maze& Tiles,int x,int y){
     char& Ret=(Tiles[pairi(x,y)]=0);
