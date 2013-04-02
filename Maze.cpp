@@ -124,7 +124,7 @@ void StructuresLoad() {
 Clears the area the structure occupies.
 */
 void StructureEraseBeforePlace(sf::Image* structure, pairi offset) {
-    pairi topLeft = offset - pairi(structure->GetWidth(), structure->GetHeight());
+    pairi topLeft = offset - pairi(structure->GetWidth()/2, structure->GetHeight()/2);
     pairi bottomRight = topLeft + pairi(structure->GetWidth(), structure->GetHeight());
     EraseMazeChunk(Maze, topLeft, bottomRight);
 }
