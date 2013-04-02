@@ -12,7 +12,7 @@ void NewMaze(){
 }
 
 /**
-TODO: Make Michael comment this. What in the world is this function doing?
+Creates pathing maps.
 */
 void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
     int Step=1;
@@ -46,14 +46,12 @@ void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
 
 /**
 TODO: Make Michael comment this. Why is it returning a char? Why does it matter if x and y are divisible by two?
+Generates the random labyrinth, don't question the magic.
 */
 char MakeTile(maze& Tiles,int x,int y){
     char& Ret=(Tiles[pairi(x,y)]=0);
     bool X=(x%2==0);
     bool Y=(y%2==0);
-    int R=rand()%10;
-    if(R==0)Ret=2;
-    else if(R<=1+GameTime/50)Ret=99;
     if(X&&Y){
         Ret=1;
         int rnd=rand()%2;
@@ -73,19 +71,24 @@ char MakeTile(maze& Tiles,int x,int y){
             if(NT!=4)NT=1;
         }
     }
-    if(Ret==99){
-        Ret=0;
-        short Power=1+GameTime/50;
-        int Rnd=rand()%10;
-        if(Rnd==0){
-            Enemy::NewFastEnemy(x,y,Power);
-        }else if(Rnd==1){
-            Enemy::NewSlowEnemy(x,y,Power);
-        }else if (Rnd>=2 && Rnd<9){
-            new Enemy(x,y,Power,5,20);
-        }else{
-            cout << "Placed a structure!";
-            StructurePlaceRandom(pairi(x,y));
+    if(Ret==1){
+        int R=rand()%10;
+        if(R==0){
+            Ret=2;
+        }else if(R<=1+GameTime/50){
+            Ret=0;
+            short Power=1+GameTime/50;
+            int Rnd=rand()%10;
+            if(Rnd==0){
+                Enemy::NewFastEnemy(x,y,Power);
+            }else if(Rnd==1){
+                Enemy::NewSlowEnemy(x,y,Power);
+            }else if (Rnd>=2 && Rnd<9){
+                new Enemy(x,y,Power,5,20);
+            }else{
+                cout << "Placed a structure!";
+                StructurePlaceRandom(pairi(x,y));
+            }
         }
     }
     return Ret;
