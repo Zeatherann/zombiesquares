@@ -9,6 +9,7 @@ void ColorsInit() {
     Colors["fast zombie"] = sf::Color(255, 0, 255);
     Colors["floor"] = sf::Color::Black;
     Colors["wall"] = sf::Color(0, 0, 128);
+    Colors["purplewall"] = sf::Color(255, 128, 255);
     Colors["point"] = sf::Color(0, 128, 0);
     Colors["starting wall"] = sf::Color(64, 64, 128);
     Colors["lazer"] = sf::Color::Cyan;

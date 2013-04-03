@@ -22,11 +22,11 @@ void Enemy::Update(){
     if(--Tick<=0){
         Tick=mTick;
         if(Player::Pathing.count(pairi(X,Y))){
-            char C=Player::Pathing[pairi(X,Y)];
+            char C=Player::Pathing[pairi(X,Y)].first;
             vector<pairi> NewCoords;
             pairi P[4]={pairi(X-1,Y),pairi(X+1,Y),pairi(X,Y-1),pairi(X,Y+1)};
             for(unsigned int i=0u;i<4u;i++){
-                if(Player::Pathing.count(P[i]))if(Player::Pathing[P[i]]<C)NewCoords.push_back(P[i]);
+                if(Player::Pathing.count(P[i]))if(Player::Pathing[P[i]].first<C)NewCoords.push_back(P[i]);
             }
             if(NewCoords.size()){
                 pairi NC=NewCoords[rand()%NewCoords.size()];
@@ -51,7 +51,7 @@ void Enemy::Load(ifstream& File){
 
 bool Enemy::Remove()const{
     Player* Char=Player::Character;
-    char C=GetTile(Maze,X,Y);
+    char C=GetTile(Maze,X,Y).first;
     if(C==1)return true;
     if(Life<=0){
         if(Char)Char->Point(1);

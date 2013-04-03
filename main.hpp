@@ -11,8 +11,9 @@
 #include <boost/filesystem.hpp>
 
 #define TileSize 32.f
-#define TileNum (4u) // Floor, Wall, Point Square, Starting Wall
-enum Tiles { Floor, Wall, Point, StartingWall };
+#define TileNum (5u) // Floor, Wall, Point Square, Starting Wall, purple wall
+enum Tiles { Invalid=-1, Floor, Wall, Point, StartingWall, PurpleWall };
+enum EntityType {InvalidEntity=-1,Zombie,SlowZombie,FastZombie,LazerType,PlayerType};
 /// Namespaces
 using namespace std;
 using namespace boost::filesystem;
@@ -39,7 +40,8 @@ template<typename Type>inline const Type& Out(const Type& Input){
 }// namespace Data
 /// Class Forward Declarations
 typedef pair<int,int> pairi;
-typedef map<pair<int,int>,char> maze;
+typedef pair<char,bool> tile;
+typedef map<pairi,tile> maze;
 class Enemy;
 class Player;
 class Menu;

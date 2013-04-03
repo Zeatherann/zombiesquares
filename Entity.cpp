@@ -13,7 +13,7 @@ Entity::~Entity(){
 
 void Entity::Clear(){
     for(Entity* Iter:Entities){
-        delete Iter;
+        Delete(Iter);
     }
     Entities.clear();
 }
@@ -90,7 +90,6 @@ void Entity::Load(ifstream& File){
     File.read((char*)&LightSource,1u);
 }
 
-void Entity::Delete(Entity*& Ent){
+void Entity::Delete(Entity* Ent){
     delete Ent;
-    Ent=NULL;
 }

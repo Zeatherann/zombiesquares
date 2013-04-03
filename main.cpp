@@ -26,7 +26,7 @@ int main(){
     sf::Event Events;
     ColorsInit();
     StructuresLoad();
-    sf::Color Tiles[TileNum]={Colors["floor"],Colors["wall"],Colors["point"],Colors["starting wall"]};
+    sf::Color Tiles[TileNum]={Colors["floor"],Colors["wall"],Colors["point"],Colors["starting wall"],Colors["purplewall"]};
     vector<sf::Shape> UIShapes;
     const sf::Input& Input=App.GetInput();
     UIElement::State CurState(Input);
@@ -240,7 +240,7 @@ int main(){
                 for(int y=Y-SR;y<=Y+SR;y++){
                     pairi Loc(x,y);
                     if(Player::Character->InSight(Loc)){
-                        unsigned int Index=GetTile(Maze,x,y);
+                        unsigned int Index=GetTile(Maze,x,y).first;
                         sf::Shape& Sq=Squares[Index];
                         char SightValue=Player::Character->GetSight(Loc);
                         float Alpha=Awake*(1.f-(float(SightValue)/float(Player::SightRadius+1)));

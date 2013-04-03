@@ -33,18 +33,18 @@ void Player::Update(){
 }
 
 bool Player::MoveTo(pairi Loc){
-    char T=GetTile(Maze,Loc.first,Loc.second);
+    char T=GetTile(Maze,Loc.first,Loc.second).first;
     if(T==1)return false;
     X=Loc.first;
     Y=Loc.second;
     if(T==2){
         Point(1);
-        Maze[Loc]=0;
+        Maze[Loc]=tile(Floor,false);
     }
     if(T==3){
-        for(pair<const pairi,char>& Iter:Maze){
-            if(Iter.second==3){
-                Iter.second=0;
+        for(pair<const pairi,tile>& Iter:Maze){
+            if(Iter.second.first==3){
+                Iter.second.first=0;
             }
         }
     }
@@ -58,7 +58,7 @@ void Player::Shoot(pairi Direction){
     while(true){
         C=C+Direction;
         if(Maze.count(C)){
-            char T=GetTile(Maze,C.first,C.second);
+            char T=GetTile(Maze,C.first,C.second).first;
             if(T==1||T==3){
                 return;
             }else{
@@ -90,12 +90,12 @@ bool Player::InSight(pairi Loc){
 }
 
 char Player::GetSight(pairi Loc){
-    if(Sight.count(Loc))return Sight[Loc];
+    if(Sight.count(Loc))return Sight[Loc].first;
     else{
         char Ret=-1;
         for(unsigned int i=0u;i<8u;i++){
             pairi P(Loc.first+Adj[i].first,Loc.second+Adj[i].second);
-            if(Sight.count(P)&&(Ret==-1||Sight[P]<Ret))Ret=Sight[P];
+            if(Sight.count(P)&&(Ret==-1||Sight[P].first<Ret))Ret=Sight[P].first;
         }
         return Ret;
     }
@@ -124,5 +124,5 @@ void Player::Load(ifstream& File){
 }
 
 bool Player::Remove()const{
-    return Score<0;
+    return false;//Score<0;
 }
