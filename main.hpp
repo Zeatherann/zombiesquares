@@ -12,7 +12,7 @@
 
 #define TileSize 32.f
 #define TileNum (5u) // Floor, Wall, Point Square, Starting Wall, purple wall
-enum Tiles { Invalid=-1, Floor, Wall, Point, StartingWall, PurpleWall };
+enum TileType { Invalid=-1, Floor, Wall, Point, StartingWall, PurpleWall };
 enum EntityType {InvalidEntity=-1,Zombie,SlowZombie,FastZombie,LazerType,PlayerType};
 /// Namespaces
 using namespace std;

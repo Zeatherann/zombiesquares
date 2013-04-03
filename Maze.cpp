@@ -42,37 +42,38 @@ void EvalMaze(maze& Tiles,pairi Tile,int Size,set<char> Blockers){
         Step++;
     }
 }
-
-Tiles Color2Tile(const sf::Color& Color){
+/**
+    Returns a TileType based on the given color.
+    This color usually refers to a pixel of a structure image, or a challenge map image.
+*/
+TileType Color2Tile(const sf::Color& Color){
     if(Color==Colors["floor"])return Floor;
     if(Color==Colors["wall"])return Wall;
     if(Color==Colors["purplewall"])return PurpleWall;
     if(Color==Colors["point"])return Point;
     return Invalid;
 }
-
+/**
+    Returns an EntityType based on the given color.
+    This color usually refers to a pixel of a structure image, or a challenge map image.
+*/
 EntityType Color2Entity(const sf::Color& Color){
     if(Color==Colors["zombie"])return Zombie;
     if(Color==Colors["fast zombie"])return FastZombie;
     if(Color==Colors["slow zombie"])return SlowZombie;
     return InvalidEntity;
 }
-
+/**
+    Placed a given structure onto the tilemap.
+    @param const sf::Image& Struct: This is the structure image to place onto the tilemap.
+    @param maze& Tiles: This is the tilemap to place the structure in.
+    @param const pairi& Coord: The location to place the structure.
+        @note Coord refers to the top left corner of the image.
+*/
 void PasteBuilding(const sf::Image& Struct,maze& Tiles,const pairi& Coord){
-    cout<<"Building Pasted!"<<endl;
-    auto GetPixelData=[](const sf::Image& Img,const pairi& Pixel)->pair<char,char>{
-        sf::Color C=Img.GetPixel(Pixel.first,Pixel.second);
-        if(C==Colors["floor"])return pair<char,char>(Floor,0);
-        if(C==Colors["wall"])return pair<char,char>(Wall,0);
-        if(C==Colors["purplewall"])return pair<char,char>(PurpleWall,0);
-        if(C==Colors["point"])return pair<char,char>(Point,0);
-        if(C==Colors["zombie"])return pair<char,char>(Floor,1);
-        if(C==Colors["fast zombie"])return pair<char,char>(Floor,2);
-        if(C==Colors["slow zombie"])return pair<char,char>(Floor,3);
-        return pair<char,char>(-1,-1);
-    };
     pairi Size(Struct.GetWidth(),Struct.GetHeight());
-    /// Pre-generate area
+    map<pairi,set<Entity*>> Ents;
+    // Pre-generate area
     for(int x=0;x<Size.first;x++){
         for(int y=0;y<Size.second;y++){
             pairi Pt(x,y);
@@ -80,32 +81,37 @@ void PasteBuilding(const sf::Image& Struct,maze& Tiles,const pairi& Coord){
             GetTile(Tiles,Loc.first,Loc.second);
         }
     }
-    // -----
-    map<pairi,set<Entity*>> Ents;
+    // Populate Entity Cells
     for(Entity* Iter:Entity::Entities){
         if(Iter->X<Coord.first||Iter->X>Coord.first+Size.first||Iter->Y<Coord.second||Iter->Y>Coord.second+Size.second)continue;
         Ents[pairi(Iter->X,Iter->Y)].insert(Iter);
     }
+    // Place Structure
     for(int x=0;x<Size.first;x++){
         for(int y=0;y<Size.second;y++){
             pairi Pt(x,y);
             pairi Loc=Pt+Coord;
-            pair<char,char> Pixel=GetPixelData(Struct,Pt);
-            if(Pixel!=pair<char,char>(-1,-1)&&!Tiles[Loc].second){
-                Tiles[Loc]=tile(Pixel.first,true);
+            sf::Color PixelColor=Struct.GetPixel(x,y);
+            TileType TileToPlace=Color2Tile(PixelColor);
+            // Check if tile is generated or placed.
+            if(TileToPlace!=Invalid&&!Tiles[Loc].second){
+                // Place Tile
+                Tiles[Loc]=tile(TileToPlace,true);
+                // Erase Pre-existing Entities
                 if(Ents.count(Loc)){
                     for(Entity* Iter:Ents[Loc]){
                         if(Iter->Type!='P')Entity::Delete(Iter);
                     }
                 }
-                switch(Pixel.second){
-                    case 1:{
+                // Place New Entity
+                switch(Color2Entity(PixelColor)){
+                    case Zombie:{
                         new Enemy(Loc.first,Loc.second);
                         break;
-                    }case 2:{
+                    }case FastZombie:{
                         Enemy::NewFastEnemy(Loc.first,Loc.second,1);
                         break;
-                    }case 3:{
+                    }case SlowZombie:{
                         Enemy::NewSlowEnemy(Loc.first,Loc.second,1);
                         break;
                     }default:break;
@@ -114,7 +120,6 @@ void PasteBuilding(const sf::Image& Struct,maze& Tiles,const pairi& Coord){
         }
     }
 }
-
 /**
 Generates the random labyrinth, don't question the magic.
 Divisible by two is the core of the maze generating algorithm. The nested test for modulo 4 sorts out the vertical and horizontal 'walls'.
@@ -184,7 +189,6 @@ void StructuresLoad() {
                 if (!success)
                     continue;
                 Structures.push_back(Img);
-                cout<<file<<endl;
             }
         }
     }

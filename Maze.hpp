@@ -11,6 +11,6 @@ void StructuresLoad();
 void StructurePlace(sf::Image structure, pairi offset);
 void StructurePlaceRandom(pairi offset);
 bool EraseMazeChunk(maze& Tiles,pairi TopLeft,pairi BottomRight);
-Tiles Color2Tile(const sf::Color& Color);
+TileType Color2Tile(const sf::Color& Color);
 EntityType Color2Entity(const sf::Color& Color);
 #endif // MAZE_HPP
