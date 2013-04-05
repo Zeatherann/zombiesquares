@@ -84,6 +84,7 @@
 		</Compiler>
 		<Unit filename="Button.cpp" />
 		<Unit filename="Button.hpp" />
+		<Unit filename="Changes.txt" />
 		<Unit filename="Colors.cpp" />
 		<Unit filename="Colors.hpp" />
 		<Unit filename="Enemy.cpp" />

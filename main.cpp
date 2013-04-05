@@ -12,21 +12,23 @@ float WinWidth=Config.WindowWidth;
 float WinHeight=Config.WindowHeight;
 string BindKey="";
 sf::Font Font;
+map<ColorType,sf::Image> TileImages;
 
 int main(){
-    float UIScale=1.f;
+    sf::Matrix3 CamMatrix;
+    sf::Matrix3 TileMatrix;
+    TileMatrix.SetFromTransformations(sf::Vector2f(0.f,0.f),sf::Vector2f(0.f,0.f),0.f,sf::Vector2f(1.f,1.f));
+    //float UIScale=1.f;
     srand(time(NULL));
     // Main Variables
     int X=0;
     int Y=0;
     int Tick=30;
-    sf::Shape Squares[TileNum];
-    sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Zombie Squares",Config.Fullscreen?sf::Style::Fullscreen:sf::Style::Titlebar|sf::Style::Resize|sf::Style::Close);
+    sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Labyrinth of Zombies",Config.Fullscreen?sf::Style::Fullscreen:sf::Style::Titlebar|sf::Style::Resize|sf::Style::Close);
     sf::View Cam(sf::FloatRect(0.f,0.f,WinWidth,WinHeight));
     sf::Event Events;
     ColorsInit();
     StructuresLoad();
-    sf::Color Tiles[TileNum]={Colors["floor"],Colors["wall"],Colors["point"],Colors["starting wall"],Colors["purplewall"]};
     vector<sf::Shape> UIShapes;
     const sf::Input& Input=App.GetInput();
     UIElement::State CurState(Input);
@@ -37,14 +39,25 @@ int main(){
     sf::FloatRect GameView;
     bool UpdateUI=true;
     bool UpdateView=true;
+    for(const pair<ColorType,sf::Color>& Iter:Colors){
+        sf::Image& TileImage=TileImages[Iter.first]=sf::Image(TileSize,TileSize,sf::Color(0,0,0,0));
+        TileImage.SetSmooth(false);
+        sf::Color Edge=Iter.second+HighLight;
+        unsigned int End=TileSize-1u;
+        for(unsigned int a=0u;a<=End;a++){
+            for(unsigned int b=0u;b<=End;b++){
+                TileImage.SetPixel(a,b,a==0u||a==End||b==0u||b==End?Edge:Iter.second);
+            }
+        }
+    }
     { /// Create UI Shapes
         sf::Shape S;
-        sf::Color C = Colors["lazer"]+HighLight;
+        sf::Color C = Colors[ct_lazer]+HighLight;
         S.SetOutlineWidth(1.f);
-        S.AddPoint({TileSize*0.125f,TileSize*0.125f},Colors["lazer"],C);
-        S.AddPoint({TileSize*0.875f,TileSize*0.125f},Colors["lazer"],C);
-        S.AddPoint({TileSize*0.875f,TileSize*0.875f},Colors["lazer"],C);
-        S.AddPoint({TileSize*0.125f,TileSize*0.875f},Colors["lazer"],C);
+        S.AddPoint({TileSize*0.125f,TileSize*0.125f},Colors[ct_lazer],C);
+        S.AddPoint({TileSize*0.875f,TileSize*0.125f},Colors[ct_lazer],C);
+        S.AddPoint({TileSize*0.875f,TileSize*0.875f},Colors[ct_lazer],C);
+        S.AddPoint({TileSize*0.125f,TileSize*0.875f},Colors[ct_lazer],C);
         UIShapes.push_back(S);
         S=sf::Shape();
     }
@@ -55,7 +68,6 @@ int main(){
     map<string,pairi> ShootKeys={{"Shoot Up",pairi(0,-1)},{"Shoot Down",pairi(0,1)},{"Shoot Left",pairi(-1,0)},{"Shoot Right",pairi(1,0)}};
     App.SetView(Cam);
     App.SetFramerateLimit(30);
-    for(unsigned int i=0u;i<TileNum;i++)Squares[i]=sf::Shape::Rectangle({1,1},{TileSize-2,TileSize-2},Tiles[i],1.f,Tiles[i]+HighLight);
     if(!Font.LoadFromFile("Font.ttf",(unsigned int)TileSize)){
         cout<<"Unable to load font \'Font.ttf\'!"<<endl;
         exit(11);
@@ -86,7 +98,7 @@ int main(){
         MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit Game",Font),[&]{MenuMode=-1;ShowMenu(MenuSaveGame);},sf::Key::X,'x'),sf::Color(0,0,255,128)),1);
         Size.x+=2.f;
         Size.y+=2.f;
-        MenuMain=new Menu(Location,Size,0.f,sf::String("Zombie Squares",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
+        MenuMain=new Menu(Location,Size,0.f,sf::String("Labyrinth of Zombies",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
         MenuMain->Buffer=TileSize*0.25f;
         Size.x-=2.f;
         Size.y-=2.f;
@@ -207,6 +219,14 @@ int main(){
                                     }
                                 }
                             }
+                            int Old=Player::SightRadius;
+                            if(Events.Key.Code==sf::Key::Add){
+                                Old++;
+                            }else if(Events.Key.Code==sf::Key::Subtract){
+                                Old--;
+                            }
+                            if(Old>=0)Player::SightRadius=Old;
+                            UpdateView=true;
                         }
                         break;
                     }default:{break;}
@@ -223,11 +243,13 @@ int main(){
             Sight=(Player::SightRadius+1)*TileSize;
             SightWidth=Sight*(Ratio>1.f?1.f:1/Ratio);
             SightHeight=Sight*(Ratio>1.f?Ratio:1.f);
-            UIScale=(Ratio>1.f?WinWidth/(Sight*2):WinHeight/(Sight*2));
+            //UIScale=(Ratio>1.f?WinWidth/(Sight*2):WinHeight/(Sight*2));
             // Move Interfaces
             GameView=sf::FloatRect(X*TileSize-SightWidth,Y*TileSize-SightHeight,(X+1)*TileSize+SightWidth,(Y+1)*TileSize+SightHeight);
             sf::Vector2f NewLoc((WinWidth-MenuPause->Size.x)*0.5f,(WinHeight-MenuPause->GetHeight())*0.5f);
             for(Menu* Iter:Menus)Iter->Move(sf::Vector2f(-Sight+TileSize,-Sight+TileSize*2.f));
+            Cam.SetFromRect(GameView);
+            CamMatrix=GetViewMatrix(Cam);
         }
         // Check Window
         if(!App.IsOpened())break;
@@ -236,29 +258,58 @@ int main(){
             Cam.SetFromRect(GameView);
             // Draw Terrain
             int SR=Player::SightRadius+1;
+            glViewport(0,0,App.GetWidth(),App.GetHeight());
+            glMatrixMode(GL_PROJECTION);
+            glLoadMatrixf(CamMatrix.Get4x4Elements());
+            glMatrixMode(GL_MODELVIEW);
+            glLoadIdentity();
+            glPushMatrix();
+            glMultMatrixf(TileMatrix.Get4x4Elements());
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
             for(int x=X-SR;x<=X+SR;x++){
                 for(int y=Y-SR;y<=Y+SR;y++){
                     pairi Loc(x,y);
                     if(Player::Character->InSight(Loc)){
-                        unsigned int Index=GetTile(Maze,x,y).first;
-                        sf::Shape& Sq=Squares[Index];
+                        int Index=GetTile(Maze,x,y).first;
                         char SightValue=Player::Character->GetSight(Loc);
                         float Alpha=Awake*(1.f-(float(SightValue)/float(Player::SightRadius+1)));
                         if(Alpha>1.f)Alpha=1.f;
                         if(Alpha<0.f)Alpha=0.f;
-                        Sq.SetColor(sf::Color(255,255,255,255.f*Alpha));
-                        Sq.SetPosition(x*TileSize,y*TileSize);
-                        App.Draw(Sq);
+                        float xx=x*TileSize;
+                        float yy=y*TileSize;
+                        TileImages[(ColorType)Index].Bind();
+                        glBegin(GL_QUADS);
+                            glColor4f(1,1,1,Alpha);
+                            glTexCoord2f(0,0);glVertex2f(xx,yy);
+                            glTexCoord2f(0,1);glVertex2f(xx,yy+TileSize-1);
+                            glTexCoord2f(1,1);glVertex2f(xx+TileSize-1,yy+TileSize-1);
+                            glTexCoord2f(1,0);glVertex2f(xx+TileSize-1,yy);
+                        glEnd();
+                        glDisable(GL_TEXTURE_2D);
                     }
                 }
             }
-        }
-        // Update and Draw Entities
-        Entity::Tick(App);
-        if(!Player::Character&&MenuMode==0){
+            // Update and Draw Entities
+            Entity::Tick();
+            glDisable(GL_TEXTURE_2D);
+            glDisable(GL_BLEND);
+            glMatrixMode(GL_MODELVIEW);
+            glPopMatrix();
+        }else if(MenuMode==0){
             MenuMode=3;
             ShowMenu(MenuGameOver);
         }
+//        TestTile.Bind();
+//        glBegin(GL_QUADS);
+//            glColor4f(1,1,1,1);
+//            glTexCoord2f(0,0);glVertex2f(0,0);
+//            glTexCoord2f(0,1);glVertex2f(0,TileSize);
+//            glTexCoord2f(1,1);glVertex2f(TileSize,TileSize);
+//            glTexCoord2f(1,0);glVertex2f(TileSize,0);
+//        glEnd();
+//        glDisable(GL_TEXTURE_2D);
+        //App.Draw(TestTileSpr);
         Cam.SetFromRect(sf::FloatRect(-SightWidth,-SightHeight,SightWidth,SightHeight));
         if(UpdateUI){
             UpdateUI=false;
@@ -328,4 +379,20 @@ void AddKeyBinding(string KeyName,int Side,Menu* MenuToAdd,sf::Vector2f Size){
     sf::Key::Code Key=Config.Controls[KeyName].first;
     //Button* B=ButtonStyle(Config.Controls[KeyName].second=new Button(sf::Vector2f(0,0),Size,sf::String(KeyName+": "+Keys.Find(Key),Font),[KeyName]{BindKey=KeyName;}),sf::Color(0,0,255,128));
     MenuToAdd->AddButton(ButtonStyle(Config.Controls[KeyName].second=new Button(sf::Vector2f(0,0),Size,sf::String(KeyName+": "+Keys.Find(Key),Font),[KeyName]{BindKey=KeyName;}),sf::Color(0,0,255,128)),Side);
+}
+
+sf::Matrix3 GetViewMatrix(const sf::View& View){
+    sf::Matrix3 Ret;
+    // Compute the 4 corners of the view
+    float Left   = View.GetCenter().x - View.GetHalfSize().x;
+    float Top    = View.GetCenter().y - View.GetHalfSize().y;
+    float Right  = View.GetCenter().x + View.GetHalfSize().x;
+    float Bottom = View.GetCenter().y + View.GetHalfSize().y;
+
+    // Update the projection matrix
+    Ret(0, 0) = 2.f / (Right - Left);
+    Ret(1, 1) = 2.f / (Top - Bottom);
+    Ret(0, 2) = (Left + Right) / (Left - Right);
+    Ret(1, 2) = (Bottom + Top) / (Bottom - Top);
+    return Ret;
 }

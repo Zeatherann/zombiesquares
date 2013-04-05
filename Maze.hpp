@@ -8,9 +8,6 @@ inline tile GetTile(maze& Tiles,int x,int y){
 }
 void PasteBuilding(const sf::Image& Struct,maze& Tiles,const pairi& Coord);
 void StructuresLoad();
-void StructurePlace(sf::Image structure, pairi offset);
-void StructurePlaceRandom(pairi offset);
-bool EraseMazeChunk(maze& Tiles,pairi TopLeft,pairi BottomRight);
-TileType Color2Tile(const sf::Color& Color);
-EntityType Color2Entity(const sf::Color& Color);
+ColorType Color2Tile(const sf::Color& Color);
+ColorType Color2Entity(const sf::Color& Color);
 #endif // MAZE_HPP

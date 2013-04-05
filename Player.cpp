@@ -6,10 +6,10 @@ maze Player::Sight;
 int Player::AggroRadius=25;
 int Player::SightRadius=5;
 
-Player::Player(sf::String& T,sf::String& H):Entity('P',0,0,Colors["player"],10),Score(0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),High(H){
+Player::Player(sf::String& T,sf::String& H):Entity(ct_player,0,0,Colors[ct_player],0),HScore(0),oX(X+1),oY(Y+1),Timer(50),Shots(3),Text(T),High(H){
     Character=this;
     High.SetText("High: "+ToString(HScore));
-    Text.SetText("Score: "+ToString(Score));
+    Text.SetText("Score: "+ToString(Life));
 }
 
 Player::~Player(){
@@ -38,8 +38,8 @@ bool Player::MoveTo(pairi Loc){
     X=Loc.first;
     Y=Loc.second;
     if(T==2){
-        Point(1);
-        Maze[Loc]=tile(Floor,false);
+        ModScore(1);
+        Maze[Loc]=tile(ct_floor,false);
     }
     if(T==3){
         for(pair<const pairi,tile>& Iter:Maze){
@@ -70,11 +70,11 @@ void Player::Shoot(pairi Direction){
     }
 }
 
-void Player::Point(int Change){
-    Score+=Change;
-    Text.SetText("Score: "+ToString(Score));
-    if(Score>HScore){
-        HScore=Score;
+void Player::ModScore(int Change){
+    Life+=Change;
+    Text.SetText("Score: "+ToString(Life));
+    if(Life>HScore){
+        HScore=Life;
         High.SetText("High: "+ToString(HScore));
     }
 }
@@ -89,13 +89,13 @@ bool Player::InSight(pairi Loc){
     return false;
 }
 
-char Player::GetSight(pairi Loc){
-    if(Sight.count(Loc))return Sight[Loc].first;
+char Player::GetSight(pairi Loc)const{
+    if(Sight.count(Loc))return Sight.find(Loc)->second.first;
     else{
         char Ret=-1;
         for(unsigned int i=0u;i<8u;i++){
             pairi P(Loc.first+Adj[i].first,Loc.second+Adj[i].second);
-            if(Sight.count(P)&&(Ret==-1||Sight[P].first<Ret))Ret=Sight[P].first;
+            if(Sight.count(P)&&(Ret==-1||Sight.find(P)->second.first<Ret))Ret=Sight.find(P)->second.first;
         }
         return Ret;
     }
@@ -103,16 +103,14 @@ char Player::GetSight(pairi Loc){
 
 void Player::Save(ofstream& File)const{
     Entity::Save(File);
-    File.write((char*)&Score,4u);
-    File.write((char*)&HScore,4u);
+    File.write((char*)&HScore,2u);
     File.write((char*)&Timer,4u);
     File.write((char*)&Shots,4u);
 }
 
 void Player::Load(ifstream& File){
     Entity::Load(File);
-    File.read((char*)&Score,4u);
-    File.read((char*)&HScore,4u);
+    File.read((char*)&HScore,2u);
     File.read((char*)&Timer,4u);
     File.read((char*)&Shots,4u);
     oX=X;
@@ -120,9 +118,9 @@ void Player::Load(ifstream& File){
     EvalMaze(Pathing,pairi(X,Y),AggroRadius,{1,3});
     EvalMaze(Sight,pairi(X,Y),SightRadius,{1});
     High.SetText("High: "+ToString(HScore));
-    Text.SetText("Score: "+ToString(Score));
+    Text.SetText("Score: "+ToString(Life));
 }
 
 bool Player::Remove()const{
-    return false;//Score<0;
+    return Life<0;
 }

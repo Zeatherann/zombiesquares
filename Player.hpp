@@ -1,7 +1,6 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 class Player:public Entity{
-    int Score;
 protected:
     // Destructor
     ~Player();
@@ -12,7 +11,7 @@ public:
     static int AggroRadius;
     static int SightRadius;
     // Variables
-    int HScore;
+    short HScore;
     int oX;
     int oY;
     int Timer;
@@ -28,9 +27,9 @@ public:
         return MoveTo(pairi(X,Y)+Offset);
     }
     void Shoot(pairi Direction);
-    void Point(int Change);
+    void ModScore(int Change);
     bool InSight(pairi Loc);
-    char GetSight(pairi Loc);
+    char GetSight(pairi Loc)const;
     void Save(ofstream& File)const;
     void Load(ifstream& File);
     bool Remove()const;

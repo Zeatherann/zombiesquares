@@ -1,11 +1,11 @@
 #include "main.hpp"
 
-Lazer::Lazer(pairi Loc,short P):Entity('L',Loc.first,Loc.second,Colors["lazer"],1,true),Hit(),Power(P){}
+Lazer::Lazer(pairi Loc,short P):Entity(ct_lazer,Loc.first,Loc.second,Colors[ct_lazer],1,true),Hit(),Power(P){}
 
 Lazer::~Lazer(){}
 
 void Lazer::Update(){
-    if(Color.a==255u)for(Entity* E:Entities)if(E->Type=='E'&&E->X==X&&E->Y==Y)E->Life-=Power;
+    if(Color.a==255u)for(Entity* E:Entities)if(Enemy::IsEnemy(E->Type)&&E->X==X&&E->Y==Y)E->Life-=Power;
     Color.a-=5u;
 }
 

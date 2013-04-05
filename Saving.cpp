@@ -35,15 +35,19 @@ void Load(string FileName){
     }
     File.read((char*)&Size,4u);
     for(unsigned int i=0u;i<Size;i++){
-        char C=File.peek();
+        ColorType C=ct_invalid;
+        File.read((char*)&C,4u);
+        File.seekg(-4,File.cur);
         switch(C){
-            case 'E':{// Enemy
+            case ct_zombie:
+            case ct_slowzombie:
+            case ct_fastzombie:{// Enemy
                 (new Enemy)->Load(File);
                 break;
-            }case 'L':{// Lazer
+            }case ct_lazer:{// Lazer
                 (new Lazer)->Load(File);
                 break;
-            }case 'P':{// Player
+            }case ct_player:{// Player
                 Player::Character->Load(File);
                 break;
             }default:{

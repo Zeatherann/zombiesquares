@@ -10,10 +10,22 @@
 #include "KeyMap.hpp"
 #include <boost/filesystem.hpp>
 
+#define Debug cout<<__FUNCTION__<<" @"<<__LINE__<<endl;
 #define TileSize 32.f
-#define TileNum (5u) // Floor, Wall, Point Square, Starting Wall, purple wall
-enum TileType { Invalid=-1, Floor, Wall, Point, StartingWall, PurpleWall };
-enum EntityType {InvalidEntity=-1,Zombie,SlowZombie,FastZombie,LazerType,PlayerType};
+#define TileNum (5u) // ct_floor, ct_wall, ct_point Square, Starting ct_wall, purple wall
+enum ColorType{
+    ct_invalid=-1, // sf::Color(0,0,0,0)
+    ct_floor, // sf::Color(0,0,0,255)
+    ct_wall, // sf::Color(0,0,128,255)
+    ct_point, // sf::Color(0,128,0,255)
+    ct_startwall, // sf::Color(64,192,64,255)
+    ct_testtile, // sf::Color(255,128,255,255)
+    ct_zombie, // sf::Color(255,0,0,255)
+    ct_slowzombie, // sf::Color(128,255,255,255)
+    ct_fastzombie, // sf::Color(255,0,255,255)
+    ct_lazer, // sf::Color(255,0,255,255)
+    ct_player // sf::Color(128,255,0,255)
+};
 /// Namespaces
 using namespace std;
 using namespace boost::filesystem;
@@ -64,12 +76,14 @@ extern KeyMap Keys;
 extern string BindKey;
 extern sf::Font Font;
 extern vector<sf::Image*> Structures;
+extern map<ColorType,sf::Image> TileImages;
 /// Global Functions
 int main();
 //-----
 void ShowMenu(Menu* M);
 void HideMenus();
 void AddKeyBinding(string KeyName,int Side,Menu* MenuToAdd,sf::Vector2f Size);
+sf::Matrix3 GetViewMatrix(const sf::View& View);
 // Templates
 template<typename Type>inline void operator+=(vector<Type>& L,const vector<Type>& R){
     L.insert(L.end(),R.begin(),R.end());

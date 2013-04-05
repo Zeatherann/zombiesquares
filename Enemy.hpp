@@ -18,5 +18,6 @@ public:
     void Save(ofstream& File)const;
     void Load(ifstream& File);
     bool Remove()const;
+    static bool IsEnemy(const ColorType& ct);
 };
 #endif // ENEMY_HPP
