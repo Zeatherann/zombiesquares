@@ -61,8 +61,6 @@ int main(){
         UIShapes.push_back(S);
         S=sf::Shape();
     }
-    sf::String ScoreTxt("Score: 0",Font,TileSize);
-    sf::String HighScore("HighScore: 0",Font,TileSize);
     sf::PostFX MenuGray;
     map<string,pairi> MoveKeys={{"Move Up",pairi(0,-1)},{"Move Down",pairi(0,1)},{"Move Left",pairi(-1,0)},{"Move Right",pairi(1,0)}};
     map<string,pairi> ShootKeys={{"Shoot Up",pairi(0,-1)},{"Shoot Down",pairi(0,1)},{"Shoot Left",pairi(-1,0)},{"Shoot Right",pairi(1,0)}};
@@ -77,6 +75,7 @@ int main(){
         cout<<"Unable to load file \'MenuEffect.sfx\'!"<<endl;
         exit(10);
     }
+    sf::String HUD_Score("Score: 0",Font,TileSize);
     MenuGray.SetTexture("framebuffer",NULL);
     // Create Interface
     Menu* MenuPause;
@@ -103,7 +102,7 @@ int main(){
         Size.x-=2.f;
         Size.y-=2.f;
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("New Game",Font),[&]{ShowMenu(MenuNewGame);},sf::Key::N,'N'),sf::Color(0,0,255,128)),1);
-        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Load Game",Font),[&]{Entity::Clear();new Player(ScoreTxt,HighScore);Load("SaveGame.zs");MenuMode=1;ShowMenu(MenuPause);},sf::Key::L,'L'),sf::Color(0,0,255,128)),1);
+        MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Load Game",Font),[&]{Entity::Clear();Player::Self=new Player();Load("SaveGame.zs");MenuMode=1;ShowMenu(MenuPause);},sf::Key::L,'L'),sf::Color(0,0,255,128)),1);
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Create Maze",Font),NULL,sf::Key::C,'C'),sf::Color(255,0,0,128)),1);
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Highscores",Font),NULL,sf::Key::H,'H'),sf::Color(255,0,0,128)),1);
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Settings",Font),[&]{ShowMenu(MenuSettings);MenuMode=4;},sf::Key::S,'S'),sf::Color(0,0,255,128)),1,1);
@@ -114,7 +113,7 @@ int main(){
         MenuNewGame->Buffer=TileSize*0.25f;
         Size.x-=2.f;
         Size.y-=2.f;
-        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Random Maze",Font),[&]{UpdateView=UpdateUI=true;NewMaze();Awake=0.f;new Player(ScoreTxt,HighScore);MenuMode=0;HideMenus();},sf::Key::R,'R'),sf::Color(0,0,255,128)),1);
+        MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Random Maze",Font),[&]{UpdateView=UpdateUI=true;NewMaze();Awake=0.f;Player::Self=new Player();MenuMode=0;HideMenus();},sf::Key::R,'R'),sf::Color(0,0,255,128)),1);
         MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Load Maze",Font),NULL,sf::Key::L,'L'),sf::Color(255,0,0,128)),1);
         MenuNewGame->AddButton(ButtonStyle(new Button({},Size,sf::String("Cancel",Font),[&]{MenuMode=2;ShowMenu(MenuMain);},sf::Key::C,'C'),sf::Color(0,0,255,128)),1);
         Size.x+=2.f;
@@ -213,8 +212,8 @@ int main(){
                             for(pair<const string,pair<sf::Key::Code,Button*>>& Iter:Config.Controls){
                                 if(Iter.second.first==Key){
                                     if(Iter.first[0]=='S'){
-                                        Player::Character->Shoot(ShootKeys[Iter.first]);
-                                    }else if(Iter.first[0]=='M'&&Player::Character->Move(MoveKeys[Iter.first])){
+                                        Player::Self->Shoot(ShootKeys[Iter.first]);
+                                    }else if(Iter.first[0]=='M'&&Player::Self->Move(MoveKeys[Iter.first])){
                                         UpdateView=true;
                                     }
                                 }
@@ -235,9 +234,9 @@ int main(){
         }// END EVENTS
         if(UpdateView){
             UpdateView=false;
-            if(Player::Character){
-                X=Player::Character->X;
-                Y=Player::Character->Y;
+            if(Player::Self){
+                X=Player::Self->X;
+                Y=Player::Self->Y;
             }
             Ratio=WinHeight/WinWidth;
             Sight=(Player::SightRadius+1)*TileSize;
@@ -254,7 +253,7 @@ int main(){
         // Check Window
         if(!App.IsOpened())break;
         // Update Game View
-        if(Player::Character){
+        if(Player::Self){
             Cam.SetFromRect(GameView);
             // Draw Terrain
             int SR=Player::SightRadius+1;
@@ -270,9 +269,9 @@ int main(){
             for(int x=X-SR;x<=X+SR;x++){
                 for(int y=Y-SR;y<=Y+SR;y++){
                     pairi Loc(x,y);
-                    if(Player::Character->InSight(Loc)){
+                    if(Player::Self->InSight(Loc)){
                         int Index=GetTile(Maze,x,y).first;
-                        char SightValue=Player::Character->GetSight(Loc);
+                        char SightValue=Player::Self->GetSight(Loc);
                         float Alpha=Awake*(1.f-(float(SightValue)/float(Player::SightRadius+1)));
                         if(Alpha>1.f)Alpha=1.f;
                         if(Alpha<0.f)Alpha=0.f;
@@ -300,16 +299,6 @@ int main(){
             MenuMode=3;
             ShowMenu(MenuGameOver);
         }
-//        TestTile.Bind();
-//        glBegin(GL_QUADS);
-//            glColor4f(1,1,1,1);
-//            glTexCoord2f(0,0);glVertex2f(0,0);
-//            glTexCoord2f(0,1);glVertex2f(0,TileSize);
-//            glTexCoord2f(1,1);glVertex2f(TileSize,TileSize);
-//            glTexCoord2f(1,0);glVertex2f(TileSize,0);
-//        glEnd();
-//        glDisable(GL_TEXTURE_2D);
-        //App.Draw(TestTileSpr);
         Cam.SetFromRect(sf::FloatRect(-SightWidth,-SightHeight,SightWidth,SightHeight));
         if(UpdateUI){
             UpdateUI=false;
@@ -321,24 +310,22 @@ int main(){
             UIGroup::UpdateAll(CurState,App);
         }
         // Draw Bullets
-        if(Player::Character){
+        if(Player::Self){
+            HUD_Score.SetText("Score: "+ToString(Player::Self->Life)+"/"+ToString(Player::Self->HScore));
             int MaxBullets=3;
-            int Shots=Player::Character->Shots;
+            int Shots=Player::Self->Shots;
             if(Shots>MaxBullets)MaxBullets=Shots;
             float W=MaxBullets*TileSize-Sight;
-            ScoreTxt.SetPosition(W,-Sight);
-            W+=ScoreTxt.GetRect().GetWidth();
-            HighScore.SetPosition(W+2,-Sight);
+            HUD_Score.SetPosition(W,-Sight);
+            W+=HUD_Score.GetRect().GetWidth();
             App.Draw(sf::Shape::Rectangle(-Sight,-Sight,Sight,TileSize-Sight,sf::Color::Black));
             App.Draw(sf::Shape::Rectangle(1-Sight,1-Sight,Sight-1,Sight-1,sf::Color(0,0,0,0),1.f,sf::Color::White));
             for(int a=0;a<Shots;a++){
                 UIShapes[0].SetPosition(a*TileSize-Sight,-Sight);
                 App.Draw(UIShapes[0]);
             }
-            // Draw HighScore
-            App.Draw(HighScore);
             // Draw Score
-            App.Draw(ScoreTxt);
+            App.Draw(HUD_Score);
         }
         // Display Scene
         App.Display();

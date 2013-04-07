@@ -5,7 +5,7 @@ protected:
     // Destructor
     ~Player();
 public:
-    static Player* Character;
+    static Player* Self;
     static maze Pathing;
     static maze Sight;
     static int AggroRadius;
@@ -16,10 +16,8 @@ public:
     int oY;
     int Timer;
     int Shots;
-    sf::String& Text;
-    sf::String& High;
     // Constructor
-    Player(sf::String& T,sf::String& H);
+    Player(int x=0,int y=0);
     // Functions
     void Update();
     bool MoveTo(pairi Loc);
@@ -27,7 +25,6 @@ public:
         return MoveTo(pairi(X,Y)+Offset);
     }
     void Shoot(pairi Direction);
-    void ModScore(int Change);
     bool InSight(pairi Loc);
     char GetSight(pairi Loc)const;
     void Save(ofstream& File)const;

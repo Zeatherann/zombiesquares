@@ -52,15 +52,15 @@ void Enemy::Load(ifstream& File){
 }
 
 bool Enemy::Remove()const{
-    Player* Char=Player::Character;
+    Player* Char=Player::Self;
     char C=GetTile(Maze,X,Y).first;
     if(C==1)return true;
     if(Life<=0){
-        if(Char)Char->ModScore(1);
+        if(Char)Char->Life++;
         return true;
     }
     if(Char&&X==Char->X&&Y==Char->Y){
-        Char->ModScore(-Power);
+        Char->Life-=Power;
         return true;
     }
     return false;

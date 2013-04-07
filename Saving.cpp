@@ -48,7 +48,7 @@ void Load(string FileName){
                 (new Lazer)->Load(File);
                 break;
             }case ct_player:{// Player
-                Player::Character->Load(File);
+                Player::Self->Load(File);
                 break;
             }default:{
                 exit(4);

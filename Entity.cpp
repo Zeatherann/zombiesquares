@@ -30,14 +30,14 @@ void Entity::Tick(){
         }
     }
     ToDraw.insert(ToDraw.end(),Lazers.begin(),Lazers.end());
-    if(Player::Character){
-        int X=Player::Character->X;
-        int Y=Player::Character->Y;
+    if(Player::Self){
+        int X=Player::Self->X;
+        int Y=Player::Self->Y;
         for(Entity* Iter:ToDraw){
             if(Iter->Type!=ct_player){
                 pairi Loc(Iter->X,Iter->Y);
-                if(abs(Iter->X-X)<=(Player::SightRadius+1)&&abs(Iter->Y-Y)<=(Player::SightRadius+1)&&Player::Character->InSight(Loc)){
-                    char Sight=Player::Character->GetSight(Loc);
+                if(abs(Iter->X-X)<=(Player::SightRadius+1)&&abs(Iter->Y-Y)<=(Player::SightRadius+1)&&Player::Self->InSight(Loc)){
+                    char Sight=Player::Self->GetSight(Loc);
                     float Alpha=(1.f-(float(Sight)/float(Player::SightRadius+1)));
                     if(Iter->LightSource||Alpha>1.f)Alpha=1.f;
                     if(Alpha<0.f)Alpha=0.f;
