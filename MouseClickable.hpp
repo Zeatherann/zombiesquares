@@ -12,7 +12,8 @@ public:
     virtual bool IsEvent(const sf::Event& EventToCheck);
     virtual void RunEvent(const sf::Event& EventToRun,const UIElement::State& CurState);
     virtual void OnClick()=0;
-    virtual void OnUnclick()=0;
+    virtual void OnUnclickInside()=0;
+    virtual void OnUnclickOutside()=0;
     // Function Pointers
     // Operators
 };

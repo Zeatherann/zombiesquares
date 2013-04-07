@@ -15,6 +15,7 @@ public:
     sf::String HotKeyString;
     bool NotIgnore;
     bool LeftPressed;
+    sf::Shape* ToDraw;
     // Constructor
     Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK=sf::Key::Count,char HKC='\0');
     // Destructor
@@ -26,10 +27,13 @@ public:
     void SetText(string text);
     void Resize(sf::Vector2f NewSize);
 
+    virtual bool IsEvent(const sf::Event& EventToCheck);
+    virtual void RunEvent(const sf::Event& EventToRun,const UIElement::State& CurState);
     virtual void KeyPress();
     virtual void KeyRelease();
     virtual void OnClick();
-    virtual void OnUnclick();
+    virtual void OnUnclickInside();
+    virtual void OnUnclickOutside();
 };
 #endif // BUTTON_HPP
 

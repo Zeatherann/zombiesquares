@@ -10,11 +10,15 @@ bool MouseClickable::IsEvent(const sf::Event& EventToCheck){
 }
 
 void MouseClickable::RunEvent(const sf::Event& EventToRun,const UIElement::State& State){
-    if(EventToRun.MouseButton.Button==ClickButton&&PointHovering(State.Mouse)){
-        if(EventToRun.Type==sf::Event::MouseButtonPressed){
-            OnClick();
-        }else{
-            OnUnclick();
+    if(EventToRun.MouseButton.Button==ClickButton){
+        if (PointHovering(State.Mouse)) {
+            if(EventToRun.Type==sf::Event::MouseButtonPressed){
+                OnClick();
+            }else{
+                OnUnclickInside();
+            }
+        } else if (EventToRun.Type==sf::Event::MouseButtonReleased) {
+            OnUnclickOutside();
         }
     }
 }
