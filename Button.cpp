@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK,char HKC):UIElement(L,S),KeyClickable(HK),MouseClickable(sf::Mouse::Left),RunOnClick(onclick),OldClick(false),Text(text),Normal(sf::Shape::Rectangle(L,L+S,sf::Color(128,128,128))),Hovering(Normal),Pressed(Normal),Hotkey(HK),HotKeyChar(HKC),HotKeyString(text),NotIgnore(true),LeftPressed(false),ToDraw(&Normal){
+Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK,char HKC):UIElement(L,S),KeyClickable(HK),MouseClickable(sf::Mouse::Left),RunOnClick(onclick),OldClick(false),Text(text),Normal(sf::Shape::Rectangle(L,L+S,sf::Color(128,128,128))),Hovering(Normal),Pressed(Normal),Hotkey(HK),HotKeyChar(HKC),HotKeyString(text),NotIgnore(true),MousePressed(false),KeyPressed(false){
     UpdateGraphics();
 }
 
@@ -43,13 +43,13 @@ void Button::UpdateGraphics(){
 }
 
 void Button::KeyPress() {
+    KeyPressed = true;
     OldClick=true;
-    ToDraw=&Pressed;
     NotIgnore=false;
 }
 
 void Button::KeyRelease() {
-    ToDraw = &Normal;
+    KeyPressed = false;
     if (RunOnClick != NULL) {
         OldClick=false;
         RunOnClick();
@@ -57,7 +57,7 @@ void Button::KeyRelease() {
 }
 
 void Button::OnClick() {
-    LeftPressed = true;
+    MousePressed = true;
     if(NotIgnore){
         OldClick=true;
         NotIgnore=false;
@@ -66,7 +66,7 @@ void Button::OnClick() {
     }
 }
 void Button::OnUnclickInside() {
-    LeftPressed = false;
+    MousePressed = false;
     if(OldClick&&RunOnClick){
         RunOnClick();
         OldClick=false;
@@ -74,7 +74,7 @@ void Button::OnUnclickInside() {
 }
 
 void Button::OnUnclickOutside() {
-    LeftPressed = false;
+    MousePressed = false;
 }
 
 bool Button::IsEvent(const sf::Event& EventToCheck) {
@@ -92,14 +92,11 @@ void Button::RunEvent(const sf::Event& EventToRun, const UIElement::State& CurSt
 
 void Button::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
     if(NeedUpdate)UpdateGraphics();
-    if(IsHovering(CurState.Mouse)){
-        if(LeftPressed){
-            ToDraw=&Pressed;
-        }else{
-            ToDraw=&Hovering;
-        }
-    } else if (ToDraw == &Hovering) {
-        ToDraw = &Normal;
+    sf::Shape* ToDraw = &Normal;
+    if (MousePressed || KeyPressed) {
+        ToDraw = &Pressed;
+    } else if (IsHovering(CurState.Mouse)) {
+        ToDraw = &Hovering;
     }
     Window.Draw(*ToDraw);
     Window.Draw(Text);

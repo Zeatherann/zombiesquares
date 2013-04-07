@@ -14,8 +14,8 @@ public:
     char HotKeyChar;
     sf::String HotKeyString;
     bool NotIgnore;
-    bool LeftPressed;
-    sf::Shape* ToDraw;
+    bool MousePressed;
+    bool KeyPressed;
     // Constructor
     Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK=sf::Key::Count,char HKC='\0');
     // Destructor
