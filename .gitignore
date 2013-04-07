@@ -3,8 +3,10 @@
 Debug/*
 Release/*
 *.exe
+*.bin
 *.zs
 *.cbTemp
 *.yml
 Git Shell.lnk
 Changes.txt
+.objs/*
