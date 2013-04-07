@@ -1,8 +1,9 @@
 #include "main.hpp"
 
-Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK,char HKC):UIElement(L,S),OnClick(onclick),OldClick(false),Text(text),Normal(sf::Shape::Rectangle(L,L+S,sf::Color(128,128,128))),Hovering(Normal),Pressed(Normal),Hotkey(HK),HotKeyChar(HKC),HotKeyString(text),NotIgnore(true),LeftPressed(false){
+Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void()> onclick,sf::Key::Code HK,char HKC):UIElement(L,S),KeyClickable(HK),MouseClickable(sf::Mouse::Left),RunOnClick(onclick),OldClick(false),Text(text),Normal(sf::Shape::Rectangle(L,L+S,sf::Color(128,128,128))),Hovering(Normal),Pressed(Normal),Hotkey(HK),HotKeyChar(HKC),HotKeyString(text),NotIgnore(true),LeftPressed(false){
+    MouseClickable::Rect = sf::FloatRect(Location.x, Location.y, Location.x+Size.x, Location.y+Size.y);
     UpdateGraphics();
-    OnPress = [&](sf::Event event, const UIElement::State& CurState) {
+    /*OnPress = [&](sf::Event event, const UIElement::State& CurState) {
         if (!Visible || (Owner && !Owner->Visible))
             return;
         if (event.MouseButton.Button == sf::Mouse::Left) {
@@ -26,19 +27,19 @@ Button::Button(sf::Vector2f L,sf::Vector2f S,sf::String text,std::function<void(
             return;
         if (event.MouseButton.Button == sf::Mouse::Left) {
             LeftPressed = false;
-            if(OldClick&&OnClick){
-                OnClick();
+            if(OldClick&&RunOnClick){
+                RunOnClick();
                 OldClick=false;
             }
         }
     };
     EventSubscriptions::subscribe(this, sf::Event::MouseButtonPressed, OnPress);
-    EventSubscriptions::subscribe(this, sf::Event::MouseButtonReleased, OnRelease);
+    EventSubscriptions::subscribe(this, sf::Event::MouseButtonReleased, OnRelease);*/
 }
 
 Button::~Button(){
-    EventSubscriptions::unsubscribe(this, sf::Event::MouseButtonPressed);
-    EventSubscriptions::unsubscribe(this, sf::Event::MouseButtonReleased);
+    /*EventSubscriptions::unsubscribe(this, sf::Event::MouseButtonPressed);
+    EventSubscriptions::unsubscribe(this, sf::Event::MouseButtonReleased);*/
 }
 
 void Button::UpdateGraphics(){
@@ -75,6 +76,21 @@ void Button::UpdateGraphics(){
     }
 }
 
+void Button::KeyPress() {
+    if (RunOnClick != NULL) {
+        OldClick=false;
+        RunOnClick();
+    }
+}
+
+void Button::KeyRelease() {
+}
+
+void Button::OnClick() {
+}
+void Button::OnUnclick() {
+}
+
 void Button::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
     if(NeedUpdate)UpdateGraphics();
     sf::Shape* ToDraw=&Normal;
@@ -85,18 +101,18 @@ void Button::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
             ToDraw=&Hovering;
         }
     }
-    if(NotIgnore&&Hotkey!=sf::Key::Count){
+    /*if(NotIgnore&&Hotkey!=sf::Key::Count){
         if(CurState.Input.IsKeyDown(Hotkey)){
             OldClick=true;
             ToDraw=&Pressed;
             NotIgnore=false;
-        }else if(OldClick&&OnClick){
+        }else if(OldClick&&RunOnClick){
             OldClick=false;
-            OnClick();
+            RunOnClick();
         }
     }else{
         NotIgnore=true;
-    }
+    }*/
     Window.Draw(*ToDraw);
     Window.Draw(Text);
     Window.Draw(HotKeyString);
