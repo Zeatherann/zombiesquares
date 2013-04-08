@@ -93,6 +93,8 @@
 		<Unit filename="Entity.hpp" />
 		<Unit filename="EventSubscriptions.cpp" />
 		<Unit filename="EventSubscriptions.hpp" />
+		<Unit filename="Globals.cpp" />
+		<Unit filename="Globals.hpp" />
 		<Unit filename="KeyMap.cpp" />
 		<Unit filename="KeyMap.hpp" />
 		<Unit filename="Lazer.cpp" />
@@ -117,6 +119,7 @@
 		<Unit filename="UIGroup.hpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.hpp" />
+		<Unit filename="main.inl" />
 		<Extensions>
 			<code_completion />
 			<envvars />

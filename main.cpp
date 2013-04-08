@@ -1,34 +1,17 @@
 #include "main.hpp"
-const sf::Color HighLight(32,32,32);
-maze Maze;
-int GameTime=0;
-pairi Adj[8]={pairi(-1,0),pairi(1,0),pairi(0,-1),pairi(0,1),pairi(1,1),pairi(-1,1),pairi(-1,-1),pairi(1,-1)};
-char MenuMode=2;
-float Awake=1.f;
-set<Menu*> Menus;
-KeyMap Keys;
-Settings Config=Settings::LoadSettings("Settings.yml");
-float WinWidth=Config.WindowWidth;
-float WinHeight=Config.WindowHeight;
-string BindKey="";
-sf::Font Font;
-map<ColorType,sf::Image> TileImages;
 
 int main(){
+    sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Labyrinth of Zombies",Config.Fullscreen?sf::Style::Fullscreen:sf::Style::Titlebar|sf::Style::Resize|sf::Style::Close);
+    InitGlobals();
     sf::Matrix3 CamMatrix;
     sf::Matrix3 TileMatrix;
     TileMatrix.SetFromTransformations(sf::Vector2f(0.f,0.f),sf::Vector2f(0.f,0.f),0.f,sf::Vector2f(1.f,1.f));
-    //float UIScale=1.f;
-    srand(time(NULL));
     // Main Variables
     int X=0;
     int Y=0;
     int Tick=30;
-    sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Labyrinth of Zombies",Config.Fullscreen?sf::Style::Fullscreen:sf::Style::Titlebar|sf::Style::Resize|sf::Style::Close);
     sf::View Cam(sf::FloatRect(0.f,0.f,WinWidth,WinHeight));
     sf::Event Events;
-    ColorsInit();
-    StructuresLoad();
     vector<sf::Shape> UIShapes;
     const sf::Input& Input=App.GetInput();
     UIElement::State CurState(Input);
@@ -39,17 +22,6 @@ int main(){
     sf::FloatRect GameView;
     bool UpdateUI=true;
     bool UpdateView=true;
-    for(const pair<ColorType,sf::Color>& Iter:Colors){
-        sf::Image& TileImage=TileImages[Iter.first]=sf::Image(TileSize,TileSize,sf::Color(0,0,0,0));
-        TileImage.SetSmooth(false);
-        sf::Color Edge=Iter.second+HighLight;
-        unsigned int End=TileSize-1u;
-        for(unsigned int a=0u;a<=End;a++){
-            for(unsigned int b=0u;b<=End;b++){
-                TileImage.SetPixel(a,b,a==0u||a==End||b==0u||b==End?Edge:Iter.second);
-            }
-        }
-    }
     { /// Create UI Shapes
         sf::Shape S;
         sf::Color C = Colors[ct_lazer]+HighLight;
@@ -61,22 +33,11 @@ int main(){
         UIShapes.push_back(S);
         S=sf::Shape();
     }
-    sf::PostFX MenuGray;
     map<string,pairi> MoveKeys={{"Move Up",pairi(0,-1)},{"Move Down",pairi(0,1)},{"Move Left",pairi(-1,0)},{"Move Right",pairi(1,0)}};
     map<string,pairi> ShootKeys={{"Shoot Up",pairi(0,-1)},{"Shoot Down",pairi(0,1)},{"Shoot Left",pairi(-1,0)},{"Shoot Right",pairi(1,0)}};
     App.SetView(Cam);
     App.SetFramerateLimit(30);
-    if(!Font.LoadFromFile("Font.ttf",(unsigned int)TileSize)){
-        cout<<"Unable to load font \'Font.ttf\'!"<<endl;
-        exit(11);
-    }
-    ((sf::Image&)Font.GetImage()).SetSmooth(false);
-    if(!MenuGray.LoadFromFile("MenuEffect.sfx")){
-        cout<<"Unable to load file \'MenuEffect.sfx\'!"<<endl;
-        exit(10);
-    }
     sf::String HUD_Score("Score: 0",Font,TileSize);
-    MenuGray.SetTexture("framebuffer",NULL);
     // Create Interface
     Menu* MenuPause;
     Menu* MenuMain;
@@ -306,7 +267,7 @@ int main(){
         }
         // Interface
         if(MenuMode!=0){
-            App.Draw(MenuGray);
+            App.Draw(BlackAndWhite);
             UIGroup::UpdateAll(CurState,App);
         }
         // Draw Bullets

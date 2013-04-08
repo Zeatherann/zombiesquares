@@ -3,17 +3,17 @@
 void Save(string FileName){
     ofstream File(FileName.c_str(),ios::out|ios::binary);
     File.write((char*)&GameTime,4u);
-    Data::Chunk Block=Data::In(Maze.size());
-    File.write(Block.first,4u);
+    unsigned int Size=Maze.size();
+    File.write((char*)&Size,4u);
     for(const pair<const pairi,tile>& Iter:Maze){
-        Block=Data::In(Iter.first.first);File.write(Block.first,4u);
-        Block=Data::In(Iter.first.second);File.write(Block.first,4u);
+        File.write((char*)&Iter.first.first,4u);
+        File.write((char*)&Iter.first.second,4u);
         File.write(&Iter.second.first,1u);
         File.write((char*)&Iter.second.second,1u);
     }
     // Save Entities
-    Block=Data::In(Entity::Entities.size());
-    File.write(Block.first,4u);
+    Size=Entity::Entities.size();
+    File.write((char*)&Size,4u);
     for(const Entity* Iter:Entity::Entities){
         Iter->Save(File);
     }
