@@ -42,7 +42,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux Debug">
-				<Option output="Zombie Squares" prefix_auto="1" extension_auto="1" />
+				<Option output="ZombieSquaresDebug.bin" prefix_auto="0" extension_auto="0" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -58,7 +58,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux Release">
-				<Option output="Zombie Squares" prefix_auto="1" extension_auto="1" />
+				<Option output="ZombieSquares.bin" prefix_auto="0" extension_auto="0" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -85,16 +85,20 @@
 		<Unit filename="Button.cpp" />
 		<Unit filename="Button.hpp" />
 		<Unit filename="Changes.txt" />
+		<Unit filename="Clickable.cpp" />
+		<Unit filename="Clickable.hpp" />
 		<Unit filename="Colors.cpp" />
 		<Unit filename="Colors.hpp" />
+		<Unit filename="Draggable.cpp" />
+		<Unit filename="Draggable.hpp" />
 		<Unit filename="Enemy.cpp" />
 		<Unit filename="Enemy.hpp" />
 		<Unit filename="Entity.cpp" />
 		<Unit filename="Entity.hpp" />
-		<Unit filename="EventSubscriptions.cpp" />
-		<Unit filename="EventSubscriptions.hpp" />
 		<Unit filename="Globals.cpp" />
 		<Unit filename="Globals.hpp" />
+		<Unit filename="KeyClickable.cpp" />
+		<Unit filename="KeyClickable.hpp" />
 		<Unit filename="KeyMap.cpp" />
 		<Unit filename="KeyMap.hpp" />
 		<Unit filename="Lazer.cpp" />
@@ -105,11 +109,15 @@
 		<Unit filename="Menu.cpp" />
 		<Unit filename="Menu.hpp" />
 		<Unit filename="MenuEffect.sfx" />
+		<Unit filename="MouseClickable.cpp" />
+		<Unit filename="MouseClickable.hpp" />
 		<Unit filename="Player.cpp" />
 		<Unit filename="Player.hpp" />
 		<Unit filename="README.txt" />
 		<Unit filename="Saving.cpp" />
 		<Unit filename="Saving.hpp" />
+		<Unit filename="Scrollable.cpp" />
+		<Unit filename="Scrollable.hpp" />
 		<Unit filename="Settings.cpp" />
 		<Unit filename="Settings.hpp" />
 		<Unit filename="State.hpp" />
