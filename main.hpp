@@ -5,14 +5,17 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <bitset>
 #include <SFML/Graphics.hpp>
 #include <yaml-cpp/yaml.h>
 #include "KeyMap.hpp"
 #include <boost/filesystem.hpp>
+#include <lua.hpp>
+#include <unordered_map>
 
 #define Debug cout<<__FUNCTION__<<" @"<<__LINE__<<endl;
 #define TileSize 32.f
-#define TileNum (5u) // ct_floor, ct_wall, ct_point Square, Starting ct_wall, purple wall
+//#define TileNum (5u) // ct_floor, ct_wall, ct_point Square, Starting ct_wall, purple wall
 /// Namespaces
 using namespace std;
 using namespace boost::filesystem;
@@ -22,19 +25,24 @@ class Player;
 class Menu;
 class Settings;
 class Button;
+class Entity;
+class Terrain;
 /// Enumerations
 enum ColorType{
-    ct_invalid=-1, // sf::Color(0,0,0,0)
-    ct_floor, // sf::Color(0,0,0,255)
-    ct_wall, // sf::Color(0,0,128,255)
-    ct_point, // sf::Color(0,128,0,255)
-    ct_startwall, // sf::Color(64,192,64,255)
-    ct_testtile, // sf::Color(255,128,255,255)
-    ct_zombie, // sf::Color(255,0,0,255)
-    ct_slowzombie, // sf::Color(128,255,255,255)
-    ct_fastzombie, // sf::Color(255,0,255,255)
-    ct_lazer, // sf::Color(255,0,255,255)
-    ct_player // sf::Color(128,255,0,255)
+    // Both
+    ct_invalid=100, // sf::Color(0,0,0,0)
+    // Tiles
+    ct_floor=200, // sf::Color(0,0,0,255)
+    ct_wall=300, // sf::Color(0,0,128,255)
+    ct_point=400, // sf::Color(0,128,0,255)
+    ct_startwall=500, // sf::Color(64,192,64,255)
+    ct_testtile=600, // sf::Color(255,128,255,255)
+    // Entities
+    ct_zombie=700, // sf::Color(255,0,0,255)
+    ct_slowzombie=800, // sf::Color(128,255,255,255)
+    ct_fastzombie=900, // sf::Color(255,0,255,255)
+    ct_lazer=1000, // sf::Color(255,0,255,255)
+    ct_player =1100// sf::Color(128,255,0,255)
 };
 enum MenuType{
     mt_singleplayer,
@@ -49,10 +57,18 @@ enum MenuType{
     mt_quitgame,
     mt_singlelose
 };
+/// Structs
+namespace std{
+    template<typename First,typename Second>struct hash<pair<First,Second>>{
+        size_t operator()(pair<First,Second> input)const{
+            return hash<First>()(input.first)^hash<Second>()(input.second);
+        }
+    };
+}// namestate std
 /// Typedefs
 typedef pair<int,int> pairi;
-typedef pair<char,bool> tile;
-typedef map<pairi,tile> maze;
+typedef pair<ColorType,bool> tile;
+typedef unordered_map<pairi,tile> maze;
 /// Global Functions
 int main();
 //-----
@@ -92,6 +108,7 @@ template<typename Type>sf::Vector2<Type> operator*(const sf::Vector2<Type>& L,co
 #include "Draggable.hpp"
 #include "Scrollable.hpp"
 #include "Maze.hpp"
+#include "Terrain.hpp"
 #include "Entity.hpp"
 #include "Lazer.hpp"
 #include "Player.hpp"

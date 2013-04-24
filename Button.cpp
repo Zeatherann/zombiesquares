@@ -43,51 +43,28 @@ void Button::UpdateGraphics(){
 }
 
 void Button::KeyPress() {
-    KeyPressed = true;
-    OldClick=true;
-    NotIgnore=false;
+    if(!MousePressed&&Visible)KeyPressed = true;
 }
 
-void Button::KeyRelease() {
-    KeyPressed = false;
-    if (RunOnClick != NULL) {
-        OldClick=false;
-        RunOnClick();
-    }
+void Button::KeyRelease(){
+//    if (KeyPressed&&RunOnClick) {
+//        RunOnClick();
+//    }
+    KeyPressed=false;
 }
 
 void Button::OnClick() {
-    MousePressed = true;
-    if(NotIgnore){
-        OldClick=true;
-        NotIgnore=false;
-    }else{
-        NotIgnore=true;
-    }
+    if(!KeyPressed&&Visible)MousePressed=true;
 }
 void Button::OnUnclickInside() {
-    MousePressed = false;
-    if(OldClick&&RunOnClick){
+    if(MousePressed&&RunOnClick){
         RunOnClick();
-        OldClick=false;
     }
+    MousePressed=false;
 }
 
 void Button::OnUnclickOutside() {
     MousePressed = false;
-}
-
-bool Button::IsEvent(const sf::Event& EventToCheck) {
-    return (KeyClickable::IsEvent(EventToCheck) || MouseClickable::IsEvent(EventToCheck));
-}
-
-void Button::RunEvent(const sf::Event& EventToRun, const UIElement::State& CurState) {
-    if (!Visible || (Owner && !Owner->Visible))
-        return;
-    if (KeyClickable::IsEvent(EventToRun))
-        KeyClickable::RunEvent(EventToRun, CurState);
-    if (MouseClickable::IsEvent(EventToRun))
-        MouseClickable::RunEvent(EventToRun, CurState);
 }
 
 void Button::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
@@ -95,7 +72,7 @@ void Button::Update(const UIElement::State& CurState,sf::RenderWindow& Window){
     sf::Shape* ToDraw = &Normal;
     if (MousePressed || KeyPressed) {
         ToDraw = &Pressed;
-    } else if (IsHovering(CurState.Mouse)) {
+    } else if (MouseClickable::PointHovering(CurState.Mouse)) {
         ToDraw = &Hovering;
     }
     Window.Draw(*ToDraw);

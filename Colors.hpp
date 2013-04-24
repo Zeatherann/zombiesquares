@@ -5,6 +5,8 @@ extern map<ColorType,sf::Color> Colors;
 extern map<sf::Color,ColorType> ColorsInv;
 void ColorsInit();
 void glColor(const sf::Color& Color);
+ColorType GetColor(const sf::Color& Color);
+sf::Color GetColor(const ColorType& Type);
 
 namespace std{
     template<> struct less<sf::Color>{

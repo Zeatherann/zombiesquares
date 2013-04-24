@@ -27,8 +27,6 @@ public:
     void SetText(string text);
     void Resize(sf::Vector2f NewSize);
 
-    virtual bool IsEvent(const sf::Event& EventToCheck);
-    virtual void RunEvent(const sf::Event& EventToRun,const UIElement::State& CurState);
     virtual void KeyPress();
     virtual void KeyRelease();
     virtual void OnClick();

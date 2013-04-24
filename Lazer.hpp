@@ -11,9 +11,9 @@ public:
     set<Enemy*> Hit;
     short Power;
     // Functions
-    void Update();
-    void Save(ofstream& File)const;
-    void Load(ifstream& File);
+    void Update(const Terrain& Land);
+    void Save(ostream& File)const;
+    void Load(istream& File);
     bool Remove()const;
 };
 #endif // LAZER_HPP

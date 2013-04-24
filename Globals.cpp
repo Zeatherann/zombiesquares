@@ -15,8 +15,17 @@ string BindKey;
 sf::Font Font;
 map<ColorType,sf::Image> TileImages;
 sf::PostFX BlackAndWhite;
+Terrain* The_Entire_World=NULL;
 
 void InitGlobals(){
+    // Setup directories.
+    path structures("Structures");
+    if(!exists(structures)||!is_directory(structures))create_directory(structures);
+    path savedgames("Saved Games");
+    if(!exists(savedgames)||!is_directory(savedgames))create_directory(savedgames);
+    path challengemaps("Challenge Maps");
+    if(!exists(challengemaps)||!is_directory(challengemaps))create_directory(challengemaps);
+    // Rest of setup.
     srand(time(NULL));
     ColorsInit();
     StructuresLoad();

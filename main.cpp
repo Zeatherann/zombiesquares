@@ -3,6 +3,13 @@
 int main(){
     sf::RenderWindow App(sf::VideoMode(WinWidth,WinHeight),"Labyrinth of Zombies",Config.Fullscreen?sf::Style::Fullscreen:sf::Style::Titlebar|sf::Style::Resize|sf::Style::Close);
     InitGlobals();
+    sf::Image TestTerrainMap;
+    if(TestTerrainMap.LoadFromFile("Challenge Maps/Random Maze.png")){
+        The_Entire_World=new Terrain(TestTerrainMap);
+        The_Entire_World->Omnisight=true;
+    }else{
+        cout<<"Blank Map"<<endl;
+    }
     sf::Matrix3 CamMatrix;
     sf::Matrix3 TileMatrix;
     TileMatrix.SetFromTransformations(sf::Vector2f(0.f,0.f),sf::Vector2f(0.f,0.f),0.f,sf::Vector2f(1.f,1.f));
@@ -45,7 +52,9 @@ int main(){
     Menu* MenuSaveGame;
     Menu* MenuGameOver;
     Menu* MenuSettings;
+    Menu* MenuSave;
     {
+        // Pause Menu
         sf::Vector2f Size(TileSize*10,TileSize);
         sf::Vector2f Location(WinWidth*0.25f,WinHeight*0.25f);
         MenuPause=new Menu(Location,Size,0.f,sf::String("Paused",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)));
@@ -56,6 +65,7 @@ int main(){
         MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Save Game",Font),[&]{Save("SaveGame.zs");},sf::Key::S,'S'),sf::Color(0,0,255,128)),1);
         MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit to Menu",Font),[&]{MenuMode=-2;ShowMenu(MenuSaveGame);},sf::Key::E,'E'),sf::Color(0,0,255,128)),1);
         MenuPause->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit Game",Font),[&]{MenuMode=-1;ShowMenu(MenuSaveGame);},sf::Key::X,'x'),sf::Color(0,0,255,128)),1);
+        // Main Menu
         Size.x+=2.f;
         Size.y+=2.f;
         MenuMain=new Menu(Location,Size,0.f,sf::String("Labyrinth of Zombies",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
@@ -68,6 +78,15 @@ int main(){
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Highscores",Font),NULL,sf::Key::H,'H'),sf::Color(255,0,0,128)),1);
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Settings",Font),[&]{ShowMenu(MenuSettings);MenuMode=4;},sf::Key::S,'S'),sf::Color(0,0,255,128)),1,1);
         MenuMain->AddButton(ButtonStyle(new Button({},Size,sf::String("Exit Game",Font),[&]{App.Close();},sf::Key::E,'E'),sf::Color(0,0,255,128)),1);
+        // Save Game
+        Size.x+=2.f;
+        Size.y+=2.f;
+        MenuSave=new Menu(Location,Size,0.f,sf::String("Save Game",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
+        MenuSave->Buffer=TileSize*0.25f;
+        Size.x-=2.f;
+        Size.y-=2.f;
+        MenuSave->AddButton(ButtonStyle(new Button({},Size,sf::String("New Game",Font),[&]{ShowMenu(MenuNewGame);},sf::Key::N,'N'),sf::Color(0,0,255,128)),1);
+        // New Game
         Size.x+=2.f;
         Size.y+=2.f;
         MenuNewGame=new Menu(Location,Size,0.f,sf::String("New Game",Font),sf::Shape::Rectangle({},{},sf::Color::Black,1.f,sf::Color(0,0,255)),false);
@@ -113,7 +132,9 @@ int main(){
         MenuSettings->AddButton(ButtonStyle(new Button({},Size,sf::String("Back to Main Menu",Font),[&]{MenuMode=2;ShowMenu(MenuMain);}),sf::Color(0,0,255,128)),0);
     }
     Menus={MenuPause,MenuMain,MenuNewGame,MenuSaveGame,MenuGameOver,MenuSettings};
-    ShowMenu(MenuMain);
+    //ShowMenu(MenuMain);
+    HideMenus();
+    MenuMode=0;
     // Game Loop
     while(App.IsOpened()){
         // Update Time
@@ -172,12 +193,12 @@ int main(){
                                 MenuMode=0;
                                 HideMenus();
                             }
-                        }else if(MenuMode==0){
+                        }else if(MenuMode==0&&The_Entire_World&&Player::Self){
                             for(pair<const string,pair<sf::Key::Code,Button*>>& Iter:Config.Controls){
                                 if(Iter.second.first==Key){
                                     if(Iter.first[0]=='S'){
-                                        Player::Self->Shoot(ShootKeys[Iter.first]);
-                                    }else if(Iter.first[0]=='M'&&Player::Self->Move(MoveKeys[Iter.first])){
+                                        Player::Self->Shoot(*The_Entire_World,ShootKeys[Iter.first]);
+                                    }else if(Iter.first[0]=='M'&&Player::Self->MoveTo(*The_Entire_World,pairi(Player::Self->X,Player::Self->Y)+MoveKeys[Iter.first])){
                                         UpdateView=true;
                                     }
                                 }
@@ -204,7 +225,7 @@ int main(){
             }
             Ratio=WinHeight/WinWidth;
             Sight=(Player::SightRadius+1)*TileSize;
-            SightWidth=Sight*(Ratio>1.f?1.f:1/Ratio);
+            SightWidth=Sight*(Ratio>1.f?1.f:1.f/Ratio);
             SightHeight=Sight*(Ratio>1.f?Ratio:1.f);
             //UIScale=(Ratio>1.f?WinWidth/(Sight*2):WinHeight/(Sight*2));
             // Move Interfaces
@@ -218,6 +239,7 @@ int main(){
         if(!App.IsOpened())break;
         // Update Game View
         if(Player::Self){
+            cout<<"Player Exists."<<endl;
             Cam.SetFromRect(GameView);
             // Draw Terrain
             int SR=Player::SightRadius+1;
@@ -230,38 +252,43 @@ int main(){
             glMultMatrixf(TileMatrix.Get4x4Elements());
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-            for(int x=X-SR;x<=X+SR;x++){
-                for(int y=Y-SR;y<=Y+SR;y++){
-                    pairi Loc(x,y);
-                    if(Player::Self->InSight(Loc)){
-                        int Index=GetTile(Maze,x,y).first;
-                        char SightValue=Player::Self->GetSight(Loc);
-                        float Alpha=Awake*(1.f-(float(SightValue)/float(Player::SightRadius+1)));
-                        if(Alpha>1.f)Alpha=1.f;
-                        if(Alpha<0.f)Alpha=0.f;
-                        float xx=x*TileSize;
-                        float yy=y*TileSize;
-                        TileImages[(ColorType)Index].Bind();
-                        glBegin(GL_QUADS);
-                            glColor4f(1,1,1,Alpha);
-                            glTexCoord2f(0,0);glVertex2f(xx,yy);
-                            glTexCoord2f(0,1);glVertex2f(xx,yy+TileSize-1);
-                            glTexCoord2f(1,1);glVertex2f(xx+TileSize-1,yy+TileSize-1);
-                            glTexCoord2f(1,0);glVertex2f(xx+TileSize-1,yy);
-                        glEnd();
-                        glDisable(GL_TEXTURE_2D);
-                    }
-                }
-            }
+            // Timer Code
+            //clock_t Timer=clock();
+            if(The_Entire_World)The_Entire_World->Draw(pairi(X,Y));
+//            for(int x=X-SR;x<=X+SR;x++){
+//                for(int y=Y-SR;y<=Y+SR;y++){
+//                    pairi Loc(x,y);
+//                    if(Player::Self->InSight(Loc)){
+//                        int Index=GetTile(Maze,x,y).first;
+//                        char SightValue=Player::Self->GetSight(Loc);
+//                        float Alpha=Awake*(1.f-(float(SightValue)/float(Player::SightRadius+1)));
+//                        if(Alpha>1.f)Alpha=1.f;
+//                        if(Alpha<0.f)Alpha=0.f;
+//                        float xx=x*TileSize;
+//                        float yy=y*TileSize;
+//                        TileImages[(ColorType)Index].Bind();
+//                        glBegin(GL_QUADS);
+//                            glColor4f(1,1,1,Alpha);
+//                            glTexCoord2f(0,0);glVertex2f(xx,yy);
+//                            glTexCoord2f(0,1);glVertex2f(xx,yy+TileSize-1);
+//                            glTexCoord2f(1,1);glVertex2f(xx+TileSize-1,yy+TileSize-1);
+//                            glTexCoord2f(1,0);glVertex2f(xx+TileSize-1,yy);
+//                        glEnd();
+//                        glDisable(GL_TEXTURE_2D);
+//                    }
+//                }
+//            }
+            //Timer=clock()-Timer;
+            //cout<<(float)Timer<<endl;
             // Update and Draw Entities
-            Entity::Tick();
+            //if(The_Entire_World)Entity::Tick(*The_Entire_World,pairi(X,Y));
             glDisable(GL_TEXTURE_2D);
             glDisable(GL_BLEND);
             glMatrixMode(GL_MODELVIEW);
             glPopMatrix();
         }else if(MenuMode==0){
-            MenuMode=3;
-            ShowMenu(MenuGameOver);
+            //MenuMode=3;
+            //ShowMenu(MenuGameOver);
         }
         Cam.SetFromRect(sf::FloatRect(-SightWidth,-SightHeight,SightWidth,SightHeight));
         if(UpdateUI){

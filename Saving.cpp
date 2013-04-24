@@ -8,7 +8,7 @@ void Save(string FileName){
     for(const pair<const pairi,tile>& Iter:Maze){
         File.write((char*)&Iter.first.first,4u);
         File.write((char*)&Iter.first.second,4u);
-        File.write(&Iter.second.first,1u);
+        File.write((char*)&Iter.second.first,4u);
         File.write((char*)&Iter.second.second,1u);
     }
     // Save Entities
@@ -29,7 +29,7 @@ void Load(string FileName){
         pair<pairi,tile> Tile;
         File.read((char*)&Tile.first.first,4u);
         File.read((char*)&Tile.first.second,4u);
-        File.read((char*)&Tile.second.first,1u);
+        File.read((char*)&Tile.second.first,4u);
         File.read((char*)&Tile.second.second,1u);
         Maze.insert(Tile);
     }

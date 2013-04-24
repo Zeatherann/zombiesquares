@@ -6,8 +6,8 @@ protected:
     ~Player();
 public:
     static Player* Self;
-    static maze Pathing;
-    static maze Sight;
+    static unordered_map<pairi,int> Pathing;
+    static unordered_map<pairi,int> Sight;
     static int AggroRadius;
     static int SightRadius;
     // Variables
@@ -19,16 +19,13 @@ public:
     // Constructor
     Player(int x=0,int y=0);
     // Functions
-    void Update();
-    bool MoveTo(pairi Loc);
-    inline bool Move(pairi Offset){
-        return MoveTo(pairi(X,Y)+Offset);
-    }
-    void Shoot(pairi Direction);
+    void Update(const Terrain& Land);
+    bool MoveTo(Terrain& Land,pairi Loc);
+    void Shoot(Terrain& Land,pairi Direction);
     bool InSight(pairi Loc);
-    char GetSight(pairi Loc)const;
-    void Save(ofstream& File)const;
-    void Load(ifstream& File);
+    float GetSight(pairi Loc)const;
+    void Save(ostream& File)const;
+    void Load(istream& File);
     bool Remove()const;
 };
 #endif // PLAYER_HPP

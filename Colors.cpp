@@ -3,6 +3,18 @@
 map<ColorType,sf::Color> Colors;
 map<sf::Color,ColorType> ColorsInv;
 
+ColorType GetColor(const sf::Color& Color){
+    map<sf::Color,ColorType>::iterator Iter=ColorsInv.find(Color);
+    if(Iter!=ColorsInv.end())return Iter->second;
+    return ct_invalid;
+}
+
+sf::Color GetColor(const ColorType& Type){
+    map<ColorType,sf::Color>::iterator Iter=Colors.find(Type);
+    if(Iter!=Colors.end())return Iter->second;
+    return sf::Color(0,0,0,0);
+}
+
 void ColorsInit() {
 #define AddColor(color,name) Colors[name]=color;ColorsInv[color]=name
     AddColor(sf::Color(0  ,0  ,0  ,0  ),ct_invalid);

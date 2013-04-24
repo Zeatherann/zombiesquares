@@ -1,8 +1,8 @@
 #include "main.hpp"
 
 Player* Player::Self;
-maze Player::Pathing;
-maze Player::Sight;
+unordered_map<pairi,int> Player::Pathing;
+unordered_map<pairi,int> Player::Sight;
 int Player::AggroRadius=25;
 int Player::SightRadius=5;
 
@@ -12,13 +12,17 @@ Player::~Player(){
     if(Self==this)Self=NULL;
 }
 
-void Player::Update(){
+void Player::Update(const Terrain& Land){
     if(Life>HScore)HScore=Life;
     if(oX!=X||oY!=Y){
         oX=X;
         oY=Y;
-        EvalMaze(Pathing,pairi(X,Y),AggroRadius,{ct_wall,ct_startwall});
-        EvalMaze(Sight,pairi(X,Y),SightRadius,{ct_wall});
+        Pathing.clear();
+        Sight.clear();
+        Land.GeneratePathing(Pathing,AggroRadius,pairi(X,Y),bitset<16>("0010000000100000"));
+        Land.GeneratePathing(Sight,SightRadius,pairi(X,Y),bitset<16>("0001000000010000"));
+        //EvalMaze(Pathing,pairi(X,Y),AggroRadius,{ct_wall,ct_startwall});
+        //EvalMaze(Sight,pairi(X,Y),SightRadius,{ct_wall});
     }
     if(Timer)Timer--;
     else{
@@ -29,33 +33,31 @@ void Player::Update(){
     }
 }
 
-bool Player::MoveTo(pairi Loc){
-    char T=GetTile(Maze,Loc.first,Loc.second).first;
-    if(T==ct_wall)return false;
-    X=Loc.first;
-    Y=Loc.second;
-    if(T==ct_point){
+bool Player::MoveTo(Terrain& Land,pairi Loc){
+    if(!Move(Land,Loc))return false;
+    Terrain::Tile* Tile=Land[Loc];
+    if(Tile->tile==ct_point){
         Life++;
-        Maze[Loc]=tile(ct_floor,false);
+        Tile->tile=ct_floor;
     }
-    if(T==ct_startwall){
-        for(pair<const pairi,tile>& Iter:Maze){
-            if(Iter.second.first==3){
-                Iter.second.first=0;
-            }
+    if(Tile->tile==ct_startwall){
+        set<pairi> Walls;
+        Land.GetAdjacentTiles(Walls,Loc);
+        for(const pairi& Iter:Walls){
+            Land[Iter]->tile=ct_floor;
         }
     }
     return true;
 }
 
-void Player::Shoot(pairi Direction){
+void Player::Shoot(Terrain& Land,pairi Direction){
     if(!Shots||Direction==pairi(0,0))return;
     Shots--;
     pairi C(X,Y);
     while(true){
         C=C+Direction;
         if(Maze.count(C)){
-            char T=GetTile(Maze,C.first,C.second).first;
+            ColorType T=Land[C]->tile;
             if(T==ct_wall||T==ct_startwall){
                 return;
             }else{
@@ -77,19 +79,23 @@ bool Player::InSight(pairi Loc){
     return false;
 }
 
-char Player::GetSight(pairi Loc)const{
-    if(Sight.count(Loc))return Sight.find(Loc)->second.first;
-    else{
-        char Ret=-1;
+float Player::GetSight(pairi Loc)const{
+    unordered_map<pairi,int>::const_iterator Iter=Sight.find(Loc);
+    unordered_map<pairi,int>::const_iterator SightEnd=Sight.cend();
+    if(Iter!=SightEnd){
+        return Iter->second;
+    }else{
+        int SightValue=-1;
         for(unsigned int i=0u;i<8u;i++){
             pairi P(Loc.first+Adj[i].first,Loc.second+Adj[i].second);
-            if(Sight.count(P)&&(Ret==-1||Sight.find(P)->second.first<Ret))Ret=Sight.find(P)->second.first;
+            unordered_map<pairi,int>::const_iterator SightIter=Sight.find(P);
+            if(SightIter!=SightEnd&&(SightValue==-1||SightIter->second<SightValue))SightValue=SightIter->second;
         }
-        return Ret;
+        return 1.f-float(SightValue)/float(SightRadius+1);
     }
 }
 
-void Player::Save(ofstream& File)const{
+void Player::Save(ostream& File)const{
     Entity::Save(File);
     File.write((char*)&HScore,2u);
     File.write((char*)&Timer,4u);
@@ -98,7 +104,7 @@ void Player::Save(ofstream& File)const{
     File.write((char*)&IsSelf,1u);
 }
 
-void Player::Load(ifstream& File){
+void Player::Load(istream& File){
     Entity::Load(File);
     File.read((char*)&HScore,2u);
     File.read((char*)&Timer,4u);
@@ -106,10 +112,8 @@ void Player::Load(ifstream& File){
     bool IsSelf=false;
     File.read((char*)&IsSelf,1u);
     if(IsSelf)Self=this;
-    oX=X;
-    oY=Y;
-    EvalMaze(Pathing,pairi(X,Y),AggroRadius,{ct_wall,ct_startwall});
-    EvalMaze(Sight,pairi(X,Y),SightRadius,{ct_wall});
+    oX=!X;
+    oY=!Y;
 }
 
 bool Player::Remove()const{

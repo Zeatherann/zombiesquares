@@ -20,15 +20,15 @@ Enemy* Enemy::NewFastEnemy(int x, int y, short power) {
 
 Enemy::~Enemy(){}
 
-void Enemy::Update(){
+void Enemy::Update(const Terrain& Land){
     if(--Tick<=0){
         Tick=mTick;
         if(Player::Pathing.count(pairi(X,Y))){
-            char C=Player::Pathing[pairi(X,Y)].first;
+            int C=Player::Pathing[pairi(X,Y)];
             vector<pairi> NewCoords;
             pairi P[4]={pairi(X-1,Y),pairi(X+1,Y),pairi(X,Y-1),pairi(X,Y+1)};
             for(unsigned int i=0u;i<4u;i++){
-                if(Player::Pathing.count(P[i]))if(Player::Pathing[P[i]].first<C)NewCoords.push_back(P[i]);
+                if(Player::Pathing.count(P[i]))if(Player::Pathing[P[i]]<C)NewCoords.push_back(P[i]);
             }
             if(NewCoords.size()){
                 pairi NC=NewCoords[rand()%NewCoords.size()];
@@ -39,13 +39,13 @@ void Enemy::Update(){
     }
 }
 
-void Enemy::Save(ofstream& File)const{
+void Enemy::Save(ostream& File)const{
     Entity::Save(File);
     File.write((char*)&Power,2u);
     File.write((char*)&Tick,1u);
 }
 
-void Enemy::Load(ifstream& File){
+void Enemy::Load(istream& File){
     Entity::Load(File);
     File.read((char*)&Power,2u);
     File.read((char*)&Tick,1u);
@@ -53,8 +53,6 @@ void Enemy::Load(ifstream& File){
 
 bool Enemy::Remove()const{
     Player* Char=Player::Self;
-    char C=GetTile(Maze,X,Y).first;
-    if(C==1)return true;
     if(Life<=0){
         if(Char)Char->Life++;
         return true;

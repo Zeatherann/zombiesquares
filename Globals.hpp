@@ -16,6 +16,7 @@ extern sf::Font Font;
 extern vector<sf::Image*> Structures;
 extern map<ColorType,sf::Image> TileImages;
 extern sf::PostFX BlackAndWhite;
+extern Terrain* The_Entire_World;
 // -----
 void InitGlobals();
 #endif // GLOBALS_HPP

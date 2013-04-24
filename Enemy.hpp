@@ -1,9 +1,6 @@
 #ifndef ENEMY_HPP
 #define ENEMY_HPP
 class Enemy:public Entity{
-protected:
-    // Destructor
-    ~Enemy();
 public:
     // Variables
     short Power;
@@ -11,12 +8,13 @@ public:
     char mTick;
     // Constructor
     Enemy(int x=0,int y=0,short p=1,short hp=5,char tick=20);
+    ~Enemy();
     static Enemy* NewSlowEnemy(int x, int y, short power);
     static Enemy* NewFastEnemy(int x, int y, short power);
     // Functions
-    void Update();
-    void Save(ofstream& File)const;
-    void Load(ifstream& File);
+    void Update(const Terrain& Land);
+    void Save(ostream& File)const;
+    void Load(istream& File);
     bool Remove()const;
     static bool IsEnemy(const ColorType& ct);
 };
